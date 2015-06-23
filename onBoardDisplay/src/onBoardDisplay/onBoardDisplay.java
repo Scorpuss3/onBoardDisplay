@@ -26,7 +26,7 @@ public class onBoardDisplay {
 	public static int xOffset;
 	public static int yOffset;
 	
-	private static void calculateAspect() {
+	public static void calculateAspect() {
 		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 		trueWidth = gd.getDisplayMode().getWidth();
 		trueHeight = gd.getDisplayMode().getHeight();
@@ -76,5 +76,13 @@ public class onBoardDisplay {
 		topLayerPanel.add(errorCodePanel,"errorCodePanel");
 		topLayerPanel.add(hudPanel,"hudPanel");
 		layout = (CardLayout) (topLayerPanel.getLayout());
+		topLayerPanel.setVisible(true);
+		topLayerFrame.add(topLayerPanel);
+		
+		layout.show(topLayerPanel, "menuPanel");
+		topLayerFrame.setSize(trueWidth,trueHeight);
+		topLayerFrame.setUndecorated(true);
+		topLayerFrame.setVisible(true);
+		menuPanel.startSensing();
 	}
 }
