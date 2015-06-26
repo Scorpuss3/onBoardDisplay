@@ -11,11 +11,11 @@ import java.awt.CardLayout;
 
 public class onBoardDisplay {
 	private static JFrame topLayerFrame;
-	private static JPanel topLayerPanel;
+	public static JPanel topLayerPanel;
 	public static CardLayout layout;
-	private static Menu.MenuPanel menuPanel;
-	private static ErrorCodes.ErrorCodePanel errorCodePanel;
-	private static HUD.HUDPanel hudPanel;
+	public static Menu.MenuPanel menuPanel;
+	public static ErrorCodes.ErrorCodePanel errorCodePanel;
+	public static HUD.HUDPanel hudPanel;
 	
 	
 	public static int graphicsWidth = 1280;//Aspect 16:9

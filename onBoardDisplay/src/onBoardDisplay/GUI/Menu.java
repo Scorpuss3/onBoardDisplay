@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Arrays;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
@@ -18,28 +19,24 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
+import onBoardDisplay.*;
+
 public class Menu {
 	public static class MenuPanel extends JPanel implements MouseListener {
         protected Option[] shownOptions;
         protected boolean sensing = false;
         protected Image button, buttonPressed;
         protected Option[] mainMenu = new Option[] {
-            new Option("Multiplayer") {
+            new Option("Display Current Data") {
                 @Override
                 public void action() {
-                    stopSensing();
-                    Fyta.settings.multiplayer = true;
-                    Fyta.layout.show(Fyta.topLayerPanel,"gameSetupPanel");
-                    Fyta.gameSetupPanel.startSensing();
+                    shownOptions = currentInfoPanel;
                 }
             },
-            new Option("Single Player") {
+            new Option("Error Codes") {
                 @Override
                 public void action() {
-                    stopSensing();
-                    Fyta.settings.multiplayer = false;
-                    Fyta.layout.show(Fyta.topLayerPanel,"gameSetupPanel");
-                    Fyta.gameSetupPanel.startSensing();
+                    shownOptions = errorCodesMenu;
                 }
             },
             new Option("Settings") {
@@ -55,25 +52,23 @@ public class Menu {
                 }
             }
         };
-        protected Option[] settingsMenu = new Option[] {
-            new Option("Controls") {
-                @Override
-                public void action() {
-                    shownOptions = controlsMenu;
-                }
-            },
-            new Option("Sound: On") {
-                @Override
-                public void action() {
-                    if (Fyta.settings.sound == true) {
-                        Fyta.settings.sound = false;
-                        this.currentCaption = "Sound: Off";
-                    } else {
-                        Fyta.settings.sound = true;
-                        this.currentCaption = "Sound: On";
+        protected Option[] currentInfoPanel = new Option[] {
+                new Option("Read Specific Value") {
+                    @Override
+                    public void action() {
+                        onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "hudPanel");
+                        onBoardDisplay.hudPanel.layout.show(onBoardDisplay.hudPanel.topLayerPanel,"rawReadSpecificPanel");
+                        onBoardDisplay.hudPanel.rawReadSpecificPanel.startRun();
+                    }
+                },
+                new Option("Exit") {
+                    @Override
+                    public void action() {
+                        System.exit(1);
                     }
                 }
-            },
+            };
+        protected Option[] settingsMenu = new Option[] {
             new Option("Aspect: 16:9") {
                 @Override
                 public void action() {
@@ -91,102 +86,6 @@ public class Menu {
                 @Override
                 public void action() {
                     shownOptions = mainMenu;
-                }
-            }
-        };
-        protected Option[] controlsMenu = new Option[] {
-            new Option("Player 1 Keys") {
-                @Override
-                public void action() {
-                    shownOptions = p1KeysMenu;
-                }
-            },
-            new Option("Player 2 Keys") {
-                @Override
-                public void action() {
-                    shownOptions = p2KeysMenu;
-                }
-            },
-            new Option("Back") {
-                @Override
-                public void action() {
-                    shownOptions = settingsMenu;
-                }
-            }
-        };
-        protected Option[] p1KeysMenu = new Option[] {
-            new Option("Attack A") {
-                @Override
-                public void action() {
-                }
-            },
-            new Option("Attack B") {
-                @Override
-                public void action() {
-                }
-            },
-            new Option("Jump") {
-                @Override
-                public void action() {
-                }
-            },
-            new Option("Dive") {
-                @Override
-                public void action() {
-                }
-            },
-            new Option("Left") {
-                @Override
-                public void action() {
-                }
-            },
-            new Option("Right") {
-                @Override
-                public void action() {
-                }
-            },
-            new Option("Back") {
-                @Override
-                public void action() {
-                    shownOptions = controlsMenu;
-                }
-            }
-        };
-        protected Option[] p2KeysMenu = new Option[] {
-            new Option("Attack A") {
-                @Override
-                public void action() {
-                }
-            },
-            new Option("Attack B") {
-                @Override
-                public void action() {
-                }
-            },
-            new Option("Jump") {
-                @Override
-                public void action() {
-                }
-            },
-            new Option("Dive") {
-                @Override
-                public void action() {
-                }
-            },
-            new Option("Left") {
-                @Override
-                public void action() {
-                }
-            },
-            new Option("Right") {
-                @Override
-                public void action() {
-                }
-            },
-            new Option("Back") {
-                @Override
-                public void action() {
-                    shownOptions = controlsMenu;
                 }
             }
         };
