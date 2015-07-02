@@ -68,12 +68,12 @@ public class onBoardDisplay {
 		calculateAspect();
 		
 		menuPanel = new Menu.MenuPanel(trueWidth,trueHeight);
-		errorCodePanel = new ErrorCodes.ErrorCodePanel(trueWidth,trueHeight);
+		//errorCodePanel = new ErrorCodes.ErrorCodePanel(trueWidth,trueHeight);
 		hudPanel = new HUD.HUDPanel(trueWidth,trueHeight);
 		
 		topLayerPanel = new JPanel(new CardLayout());
 		topLayerPanel.add(menuPanel, "menuPanel");
-		topLayerPanel.add(errorCodePanel,"errorCodePanel");
+		//topLayerPanel.add(errorCodePanel,"errorCodePanel");
 		topLayerPanel.add(hudPanel,"hudPanel");
 		layout = (CardLayout) (topLayerPanel.getLayout());
 		topLayerPanel.setVisible(true);

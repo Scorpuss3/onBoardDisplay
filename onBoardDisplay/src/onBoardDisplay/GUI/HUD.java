@@ -16,21 +16,33 @@ import onBoardDisplay.onBoardDisplay;
 import onBoardDisplay.GUI.HUDLayouts.*;
 
 public class HUD {
-	public class HUDPanel extends JPanel {
+	public static class HUDPanel extends JPanel {
 		public static CardLayout layout;
 		public static Cylinders.CylinderPanel cylinderPanel;
 		public static RawReadSpecific.RawReadSpecificPanel rawReadSpecificPanel;
 		public static Dash.DashPanel dashPanel;
 		public static Graph.GraphPanel graphPanel;
+		public static JPanel hudTopLayerPanel;
 		
 		public HUDPanel(int width,int height) {
             this.setSize(width,height);
             
             cylinderPanel = new Cylinders.CylinderPanel(width,height);
             rawReadSpecificPanel =  new RawReadSpecific.RawReadSpecificPanel(width,hieght);
+            dashPanel = new Dash.DashPanel(width,height);
+            graphPanel = new Graph.GraphPanel(width,height);
             
-            //TODO Add rest of cardlayout stuff to mimic the way it is used in the onBoardDisplay class.
+            hudTopLayerPanel = new JPanel(new CardLayout());
+            hudTopLayerPanel.add(cylinderPanel,"cylinderPanel");
+            hudTopLayerPanel.add(rawReadSpecificPanel, "rawReadSpecificPanel");
+            hudTopLayerPanel.add(dashPanel,"dashPanel");
+            hudTopLayerPanel.add(graphPanel,"graphPanel");
+            layout = (CardLayout) (hudTopLayerPanel.getLayout());
+            hudTopLayerPanel.setVisible(true);
+            add(hudTopLayerPanel);
             
+            layout.show(hudTopLayerPanel, "dashPanel"); //Is only the default, should be reset before this panel is shown.
+            setSize(onBoardDisplay.trueWidth,onBoardDisplay.trueHeight);
             setVisible(true);
             System.out.println("All HUD setup done.");
         }

@@ -57,29 +57,47 @@ public class Menu {
                     @Override
                     public void action() {
                         onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "hudPanel");
-                        onBoardDisplay.hudPanel.layout.show(onBoardDisplay.hudPanel.topLayerPanel,"rawReadSpecificPanel");
+                        onBoardDisplay.hudPanel.layout.show(onBoardDisplay.hudPanel.hudTopLayerPanel,"rawReadSpecificPanel");
                         onBoardDisplay.hudPanel.rawReadSpecificPanel.startRun();
                     }
                 },
-                new Option("Exit") {
+                //TODO add options for other HUDs.
+                new Option("Back") {
                     @Override
                     public void action() {
-                        System.exit(1);
+                        shownOptions = mainMenu;
                     }
                 }
             };
+        
+        protected Option[] errorCodesPanel = new Option[] {
+                new Option("Read Specific Codes") {
+                    @Override
+                    public void action() {
+                        onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "errorCodePanel");
+                        //TODO add setup stuff for the error code panel.
+                    }
+                },
+                new Option("Back") {
+                    @Override
+                    public void action() {
+                        shownOptions = mainMenu;
+                    }
+                }
+            };
+        
         protected Option[] settingsMenu = new Option[] {
             new Option("Aspect: 16:9") {
                 @Override
                 public void action() {
-                    if (onBoardDisplay.onBoardDisplay.graphicsWidth == 1280) {
-                        onBoardDisplay.onBoardDisplay.graphicsWidth = 960;
+                    if (onBoardDisplay.graphicsWidth == 1280) {
+                        onBoardDisplay.graphicsWidth = 960;
                         this.currentCaption = "Aspect: 4:3";
                     } else {
-                        onBoardDisplay.onBoardDisplay.graphicsWidth = 1280;
+                        onBoardDisplay.graphicsWidth = 1280;
                         this.currentCaption = "Aspect: 16:9";
                     }
-                    onBoardDisplay.onBoardDisplay.calculateAspect();
+                    onBoardDisplay.calculateAspect();
                 }
             },
             new Option("Back") {
@@ -98,22 +116,22 @@ public class Menu {
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                     RenderingHints.VALUE_ANTIALIAS_ON);
             g2d.setColor(Color.BLACK);
-            g2d.fillRect(0,0,onBoardDisplay.onBoardDisplay.trueWidth,onBoardDisplay.onBoardDisplay.trueHeight);
+            g2d.fillRect(0,0,onBoardDisplay.trueWidth,onBoardDisplay.trueHeight);
             g2d.setColor(Color.LIGHT_GRAY);
-            g2d.fillRect(onBoardDisplay.onBoardDisplay.ModifyAspectX(0),onBoardDisplay.onBoardDisplay.ModifyAspectY(0),
-                    onBoardDisplay.onBoardDisplay.ModifyAspect(onBoardDisplay.onBoardDisplay.graphicsWidth) ,
-                    onBoardDisplay.onBoardDisplay.ModifyAspect(onBoardDisplay.onBoardDisplay.graphicsHeight));
+            g2d.fillRect(onBoardDisplay.ModifyAspectX(0),onBoardDisplay.ModifyAspectY(0),
+                    onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsWidth) ,
+                    onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsHeight));
             g2d.setColor(Color.RED);
-            g2d.drawRect(onBoardDisplay.onBoardDisplay.ModifyAspectX(100),
-                    onBoardDisplay.onBoardDisplay.ModifyAspectY(100),
-                    onBoardDisplay.onBoardDisplay.ModifyAspect(onBoardDisplay.onBoardDisplay.graphicsWidth-200),
-                    onBoardDisplay.onBoardDisplay.ModifyAspect(onBoardDisplay.onBoardDisplay.graphicsHeight-200));
-            g2d.setFont(new Font("Gill Sans", Font.BOLD , onBoardDisplay.onBoardDisplay.ModifyAspect(90)));
-            g2d.drawString("FYTA", onBoardDisplay.onBoardDisplay.ModifyAspectX((onBoardDisplay.onBoardDisplay.graphicsWidth/2)-115),
-                    onBoardDisplay.onBoardDisplay.ModifyAspectY(80));
+            g2d.drawRect(onBoardDisplay.ModifyAspectX(100),
+                    onBoardDisplay.ModifyAspectY(100),
+                    onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsWidth-200),
+                    onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsHeight-200));
+            g2d.setFont(new Font("Gill Sans", Font.BOLD , onBoardDisplay.ModifyAspect(90)));
+            g2d.drawString("FYTA", onBoardDisplay.ModifyAspectX((onBoardDisplay.graphicsWidth/2)-115),
+                    onBoardDisplay.ModifyAspectY(80));
             
             g2d.setFont(new Font("Gill Sans", Font.BOLD ,
-                    onBoardDisplay.onBoardDisplay.ModifyAspect(30)));
+                    onBoardDisplay.ModifyAspect(30)));
             int spacing = 100;
             Image buttonTexture;
             for (Option option : shownOptions){
@@ -124,22 +142,22 @@ public class Menu {
                     g2d.setColor(Color.RED);
                     buttonTexture = button;
                 }
-                option.xPosition =(onBoardDisplay.onBoardDisplay.graphicsWidth/2)-(option.width/2);
+                option.xPosition =(onBoardDisplay.graphicsWidth/2)-(option.width/2);
                 spacing += option.height + 5;
                 option.yPosition = spacing;
-                //g2d.drawRect(onBoardDisplay.onBoardDisplay.ModifyAspectX(option.xPosition),
-                //        onBoardDisplay.onBoardDisplay.ModifyAspectY(option.yPosition),
-                //        onBoardDisplay.onBoardDisplay.ModifyAspect(option.width),
-                //        onBoardDisplay.onBoardDisplay.ModifyAspect(option.height));
+                //g2d.drawRect(onBoardDisplay.ModifyAspectX(option.xPosition),
+                //        onBoardDisplay.ModifyAspectY(option.yPosition),
+                //        onBoardDisplay.ModifyAspect(option.width),
+                //        onBoardDisplay.ModifyAspect(option.height));
                 g2d.drawImage(buttonTexture,
-                        onBoardDisplay.onBoardDisplay.ModifyAspectX(option.xPosition),
-                        onBoardDisplay.onBoardDisplay.ModifyAspectY(option.yPosition),
-                        onBoardDisplay.onBoardDisplay.ModifyAspect(option.width),
-                        onBoardDisplay.onBoardDisplay.ModifyAspect(option.height),
+                        onBoardDisplay.ModifyAspectX(option.xPosition),
+                        onBoardDisplay.ModifyAspectY(option.yPosition),
+                        onBoardDisplay.ModifyAspect(option.width),
+                        onBoardDisplay.ModifyAspect(option.height),
                         this);
                 g2d.drawString(option.currentCaption,
-                        onBoardDisplay.onBoardDisplay.ModifyAspectX(option.xPosition + 2),
-                        onBoardDisplay.onBoardDisplay.ModifyAspectY(option.yPosition+option.height-5));
+                        onBoardDisplay.ModifyAspectX(option.xPosition + 2),
+                        onBoardDisplay.ModifyAspectY(option.yPosition+option.height-5));
                 //The adding is needed above because strings are drawn with
                 //the y co-ordinate as the bottom, not top.
             }
@@ -179,8 +197,8 @@ public class Menu {
         public void mousePressed(MouseEvent e) {
             int trueXPos = e.getX();
             int trueYPos = e.getY();
-            int xPos = (int)((trueXPos - onBoardDisplay.onBoardDisplay.xOffset)/onBoardDisplay.onBoardDisplay.graphicsMultiplier);
-            int yPos = (int)((trueYPos - onBoardDisplay.onBoardDisplay.yOffset)/onBoardDisplay.onBoardDisplay.graphicsMultiplier);
+            int xPos = (int)((trueXPos - onBoardDisplay.xOffset)/onBoardDisplay.graphicsMultiplier);
+            int yPos = (int)((trueYPos - onBoardDisplay.yOffset)/onBoardDisplay.graphicsMultiplier);
             System.out.print("Mouse press at "); System.out.print(xPos);
             System.out.print(","); System.out.println(yPos);
             for (Option option : shownOptions) {
