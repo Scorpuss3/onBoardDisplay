@@ -48,7 +48,7 @@ public class HUD {
         }
 	}
 
-	public class HUDLayoutPanel extends JPanel{
+	public static class HUDLayoutPanel extends JPanel{
 		private boolean running = false;
 		
 		public void setUpKeyboardListener() {
