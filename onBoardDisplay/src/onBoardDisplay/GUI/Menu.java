@@ -27,7 +27,7 @@ public class Menu {
         protected boolean sensing = false;
         protected Image button, buttonPressed;
         protected Option[] mainMenu = new Option[] {
-            new Option("Display Current Data") {
+            new Option("Display Readings") {
                 @Override
                 public void action() {
                     shownOptions = currentInfoMenu;
@@ -53,7 +53,7 @@ public class Menu {
             }
         };
         protected Option[] currentInfoMenu = new Option[] {
-                new Option("Read Specific Value") {
+                new Option("Specific Value") {
                     @Override
                     public void action() {
                         onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "hudPanel");
@@ -62,7 +62,7 @@ public class Menu {
                         stopSensing();
                     }
                 },
-                new Option("Show Cylinder Information") {
+                new Option("Cylinder Info") {
                     @Override
                     public void action() {
                         onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "hudPanel");
@@ -146,7 +146,7 @@ public class Menu {
                                     RenderingHints.VALUE_ANTIALIAS_ON);
             g2d.setColor(Color.BLACK);
             g2d.fillRect(0,0,onBoardDisplay.trueWidth,onBoardDisplay.trueHeight);
-            g2d.setColor(Color.LIGHT_GRAY);
+            g2d.setColor(Color.BLACK);
             g2d.fillRect(onBoardDisplay.ModifyAspectX(0),onBoardDisplay.ModifyAspectY(0),
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsWidth) ,
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsHeight));
@@ -165,13 +165,14 @@ public class Menu {
             Image buttonTexture;
             for (Option option : shownOptions){
                 if (option.selected) {
-                    g2d.setColor(Color.BLUE);
+                    g2d.setColor(Color.PINK);
                     buttonTexture = buttonPressed;
                 } else {
                     g2d.setColor(Color.RED);
                     buttonTexture = button;
                 }
-                option.xPosition =(onBoardDisplay.graphicsWidth/2)-(option.width/2);
+                //option.xPosition =(onBoardDisplay.graphicsWidth/2)-(option.width/2);
+                option.xPosition = (onBoardDisplay.graphicsWidth/8);
                 spacing += option.height + 5;
                 option.yPosition = spacing;
                 //g2d.drawRect(onBoardDisplay.ModifyAspectX(option.xPosition),
@@ -185,8 +186,8 @@ public class Menu {
                         onBoardDisplay.ModifyAspect(option.height),
                         this);
                 g2d.drawString(option.currentCaption,
-                        onBoardDisplay.ModifyAspectX(option.xPosition + 2),
-                        onBoardDisplay.ModifyAspectY(option.yPosition+option.height-5));
+                        onBoardDisplay.ModifyAspectX(option.xPosition + 70),
+                        onBoardDisplay.ModifyAspectY(option.yPosition+option.height-20));
                 //The adding is needed above because strings are drawn with
                 //the y co-ordinate as the bottom, not top.
             }
@@ -196,7 +197,7 @@ public class Menu {
             protected String currentCaption;
             protected int xPosition;
             protected int yPosition;
-            protected int width = 200;
+            protected int width = 400;
             protected int height = 60;
             protected boolean selected;
             protected Object link; //For optional extra use.
