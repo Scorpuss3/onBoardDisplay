@@ -4,9 +4,11 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 
 import onBoardDisplay.GUI.*;
+import onBoardDisplay.carInterface.CarInterface;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
 import java.awt.CardLayout;
 
 public class onBoardDisplay {
@@ -17,6 +19,7 @@ public class onBoardDisplay {
 	public static ErrorCodes.ErrorCodePanel errorCodePanel;
 	public static HUD.HUDPanel hudPanel;
 	
+	public static CarInterface carInterface;
 	
 	public static int graphicsWidth = 1280;//Aspect 16:9
 	public static int graphicsHeight = 720;
@@ -66,6 +69,8 @@ public class onBoardDisplay {
 	public static void main(String[] args) {
 		topLayerFrame = new JFrame();
 		calculateAspect();
+		
+		carInterface = new CarInterface();
 		
 		menuPanel = new Menu.MenuPanel(trueWidth,trueHeight);
 		//errorCodePanel = new ErrorCodes.ErrorCodePanel(trueWidth,trueHeight);

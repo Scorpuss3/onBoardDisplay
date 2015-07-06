@@ -17,18 +17,18 @@ import onBoardDisplay.GUI.HUDLayouts.*;
 
 public class HUD {
 	public static class HUDPanel extends JPanel {
-		public static CardLayout layout;
-		public static Cylinders.CylinderPanel cylinderPanel;
-		public static RawReadSpecific.RawReadSpecificPanel rawReadSpecificPanel;
-		public static Dash.DashPanel dashPanel;
-		public static Graph.GraphPanel graphPanel;
-		public static JPanel hudTopLayerPanel;
+		public CardLayout layout;
+		public Cylinders.CylinderPanel cylinderPanel;
+		public RawReadSpecific.RawReadSpecificPanel rawReadSpecificPanel;
+		public Dash.DashPanel dashPanel;
+		public Graph.GraphPanel graphPanel;
+		public JPanel hudTopLayerPanel;
 		
 		public HUDPanel(int width,int height) {
             this.setSize(width,height);
             
             cylinderPanel = new Cylinders.CylinderPanel(width,height);
-            rawReadSpecificPanel =  new RawReadSpecific.RawReadSpecificPanel(width,hieght);
+            rawReadSpecificPanel =  new RawReadSpecific.RawReadSpecificPanel(width,height);
             dashPanel = new Dash.DashPanel(width,height);
             graphPanel = new Graph.GraphPanel(width,height);
             
@@ -74,6 +74,14 @@ public class HUD {
                 repaint();
             }
         }
+		
+		public void startRun() {
+			running = true;
+		}
+		
+		public void stopRun() {
+			running = false;
+		}
 		
 		public HUDLayoutPanel(int width,int height) {
             this.setSize(width,height);

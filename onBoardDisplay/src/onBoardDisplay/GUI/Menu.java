@@ -30,7 +30,7 @@ public class Menu {
             new Option("Display Current Data") {
                 @Override
                 public void action() {
-                    shownOptions = currentInfoPanel;
+                    shownOptions = currentInfoMenu;
                 }
             },
             new Option("Error Codes") {
@@ -52,13 +52,41 @@ public class Menu {
                 }
             }
         };
-        protected Option[] currentInfoPanel = new Option[] {
+        protected Option[] currentInfoMenu = new Option[] {
                 new Option("Read Specific Value") {
                     @Override
                     public void action() {
                         onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "hudPanel");
                         onBoardDisplay.hudPanel.layout.show(onBoardDisplay.hudPanel.hudTopLayerPanel,"rawReadSpecificPanel");
                         onBoardDisplay.hudPanel.rawReadSpecificPanel.startRun();
+                        stopSensing();
+                    }
+                },
+                new Option("Show Cylinder Information") {
+                    @Override
+                    public void action() {
+                        onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "hudPanel");
+                        onBoardDisplay.hudPanel.layout.show(onBoardDisplay.hudPanel.hudTopLayerPanel,"cylinderPanel");
+                        onBoardDisplay.hudPanel.cylinderPanel.startRun();
+                        stopSensing();
+                    }
+                },
+                new Option("Show Dash") {
+                    @Override
+                    public void action() {
+                        onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "hudPanel");
+                        onBoardDisplay.hudPanel.layout.show(onBoardDisplay.hudPanel.hudTopLayerPanel,"dashPanel");
+                        onBoardDisplay.hudPanel.dashPanel.startRun();
+                        stopSensing();
+                    }
+                },
+                new Option("Graph Changes") {
+                    @Override
+                    public void action() {
+                        onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "hudPanel");
+                        onBoardDisplay.hudPanel.layout.show(onBoardDisplay.hudPanel.hudTopLayerPanel,"graphPanel");
+                        onBoardDisplay.hudPanel.graphPanel.startRun();
+                        stopSensing();
                     }
                 },
                 //TODO add options for other HUDs.
@@ -70,12 +98,13 @@ public class Menu {
                 }
             };
         
-        protected Option[] errorCodesPanel = new Option[] {
-                new Option("Read Specific Codes") {
+        protected Option[] errorCodesMenu = new Option[] {
+                new Option("Read All Codes") {
                     @Override
                     public void action() {
                         onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "errorCodePanel");
-                        //TODO add setup stuff for the error code panel.
+                        //TODO Add error code stuff.
+                        stopSensing();
                     }
                 },
                 new Option("Back") {
@@ -127,7 +156,7 @@ public class Menu {
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsWidth-200),
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsHeight-200));
             g2d.setFont(new Font("Gill Sans", Font.BOLD , onBoardDisplay.ModifyAspect(90)));
-            g2d.drawString("FYTA", onBoardDisplay.ModifyAspectX((onBoardDisplay.graphicsWidth/2)-115),
+            g2d.drawString("On Board Display", onBoardDisplay.ModifyAspectX((onBoardDisplay.graphicsWidth/2)-350),
                     onBoardDisplay.ModifyAspectY(80));
             
             g2d.setFont(new Font("Gill Sans", Font.BOLD ,
@@ -309,10 +338,11 @@ public class Menu {
             setUpKeyboardListener();
             addMouseListener(this);
             try {
-                button = ImageIO.read(getClass().getResourceAsStream("Textures/Button.png"));
-                buttonPressed = ImageIO.read(getClass().getResourceAsStream("Textures/ButtonSelected.png"));
+                button = ImageIO.read(getClass().getResourceAsStream("/onBoardDisplay/Res/Button.png"));
+                buttonPressed = ImageIO.read(getClass().getResourceAsStream("/onBoardDisplay/Res/ButtonSelected.png"));
             }catch(Exception e){
                 System.err.println(e);
+                System.err.println("...So could not load button textures.");
             }
             setVisible(true);
             System.out.println("Setup done.");
