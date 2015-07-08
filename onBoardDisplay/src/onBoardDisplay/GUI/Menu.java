@@ -156,7 +156,7 @@ public class Menu {
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsWidth-200),
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsHeight-200));
             g2d.setFont(new Font("Gill Sans", Font.BOLD , onBoardDisplay.ModifyAspect(90)));
-            g2d.drawString("On Board Display", onBoardDisplay.ModifyAspectX((onBoardDisplay.graphicsWidth/2)-350),
+            g2d.drawString("On Board Display", onBoardDisplay.ModifyAspectX((onBoardDisplay.graphicsWidth/2)-380),
                     onBoardDisplay.ModifyAspectY(80));
             
             g2d.setFont(new Font("Gill Sans", Font.BOLD ,

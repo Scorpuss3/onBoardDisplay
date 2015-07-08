@@ -4,7 +4,7 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 
 import onBoardDisplay.GUI.*;
-import onBoardDisplay.carInterface.CarInterface;
+import onBoardDisplay.carInterfacing.*;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -19,7 +19,7 @@ public class onBoardDisplay {
 	public static ErrorCodes.ErrorCodePanel errorCodePanel;
 	public static HUD.HUDPanel hudPanel;
 	
-	public static CarInterface carInterface;
+	public static CarInterfacing.CarInterface carInterface;
 	
 	public static int graphicsWidth = 1280;//Aspect 16:9
 	public static int graphicsHeight = 720;
