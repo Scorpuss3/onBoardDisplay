@@ -103,7 +103,7 @@ public class Menu {
                     @Override
                     public void action() {
                         onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "errorCodePanel");
-                        //TODO Add error code stuff.
+                        onBoardDisplay.errorCodePanel.startRun();
                         stopSensing();
                     }
                 },
@@ -204,6 +204,14 @@ public class Menu {
             
             public Option (String currentCaption) {
                 this.currentCaption = currentCaption;
+            }
+            
+            public Option(String currentCaption, int xPosition, int yPosition, int width, int height) {
+            	this.currentCaption = currentCaption;
+            	this.xPosition = xPosition;
+            	this.yPosition = yPosition;
+            	this.width = width;
+            	this.height = height;
             }
             
             public void select() {

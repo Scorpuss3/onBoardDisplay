@@ -70,15 +70,15 @@ public class onBoardDisplay {
 		topLayerFrame = new JFrame();
 		calculateAspect();
 		
-		carInterface = new CarInterface();
+		carInterface = new CarInterfacing.CarInterface();
 		
 		menuPanel = new Menu.MenuPanel(trueWidth,trueHeight);
-		//errorCodePanel = new ErrorCodes.ErrorCodePanel(trueWidth,trueHeight);
+		errorCodePanel = new ErrorCodes.ErrorCodePanel(trueWidth,trueHeight);
 		hudPanel = new HUD.HUDPanel(trueWidth,trueHeight);
 		
 		topLayerPanel = new JPanel(new CardLayout());
 		topLayerPanel.add(menuPanel, "menuPanel");
-		//topLayerPanel.add(errorCodePanel,"errorCodePanel");
+		topLayerPanel.add(errorCodePanel,"errorCodePanel");
 		topLayerPanel.add(hudPanel,"hudPanel");
 		layout = (CardLayout) (topLayerPanel.getLayout());
 		topLayerPanel.setVisible(true);
@@ -88,6 +88,7 @@ public class onBoardDisplay {
 		topLayerFrame.setSize(trueWidth,trueHeight);
 		topLayerFrame.setUndecorated(true);
 		topLayerFrame.setVisible(true);
+		System.out.println("Menu setup and class instances set up, Starting run...");
 		menuPanel.startSensing();
 	}
 }
