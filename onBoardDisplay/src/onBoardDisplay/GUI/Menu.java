@@ -197,7 +197,7 @@ public class Menu {
             protected String currentCaption;
             protected int xPosition;
             protected int yPosition;
-            protected int width = 400;
+            protected int width = 400;//a test comment.
             protected int height = 60;
             protected boolean selected;
             protected Object link; //For optional extra use.
