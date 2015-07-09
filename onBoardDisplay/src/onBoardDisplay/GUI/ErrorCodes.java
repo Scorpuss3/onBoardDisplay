@@ -9,6 +9,7 @@ import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -19,19 +20,22 @@ import javax.swing.KeyStroke;
 
 import onBoardDisplay.onBoardDisplay;
 import onBoardDisplay.GUI.Menu.MenuPanel.Option;
+import onBoardDisplay.dataHandling.Code;
+import onBoardDisplay.dataHandling.DataHandler;
 
 public class ErrorCodes {
 	public static class ErrorCodePanel extends JPanel implements MouseListener {
 		private boolean running = false;
-		private short[] errorCodes;
+		private ArrayList<Option> shownCodes = new ArrayList<>();
+		private int numOfCodes = 0;
 		private Menu.MenuPanel.Option[] buttons = new Menu.MenuPanel.Option[] {
-			new Menu.MenuPanel.Option("Run Scan",55,onBoardDisplay.graphicsHeight-60-55,400,60) {
+			new Menu.MenuPanel.Option("Run Scan",55,onBoardDisplay.graphicsHeight-60-55,400,60,null) {
 				@Override
 				public void action() {
 					runScan();
 				}
 			},
-			new Menu.MenuPanel.Option("Exit",55+400+5,onBoardDisplay.graphicsHeight-60-55,400,60) {
+			new Menu.MenuPanel.Option("Exit",55+400+5,onBoardDisplay.graphicsHeight-60-55,400,60,null) {
 				@Override
 				public void action() {
 					keyAction("ESCAPE");
@@ -48,6 +52,16 @@ public class ErrorCodes {
             System.out.print("Mouse press at "); System.out.print(xPos);
             System.out.print(","); System.out.println(yPos);
             for (Option option : buttons) {
+                System.out.print(option.currentCaption); System.out.print(option.xPosition); System.out.println(option.yPosition);
+                if (xPos >= option.xPosition &&
+                        (xPos <= (option.xPosition + option.width) &&
+                        yPos >= option.yPosition &&
+                        yPos <= (option.yPosition + option.height))) {
+                    option.select();
+                } else {
+                    option.deselect();
+                }
+            }for (Option option : shownCodes) {
                 System.out.print(option.currentCaption); System.out.print(option.xPosition); System.out.println(option.yPosition);
                 if (xPos >= option.xPosition &&
                         (xPos <= (option.xPosition + option.width) &&
@@ -98,12 +112,40 @@ public class ErrorCodes {
                             option.action();
                         }
                     }
+                	for (Option option : shownCodes) {
+                		if (option.selected) {
+                			option.action();
+                		}
+                	}
                 }
                 repaint();
             }
         }
 		
 		public void runScan() {
+			short[] errorCodes = onBoardDisplay.carInterface.getErrorCodes();
+			int x = 65;
+			int y = 110;
+			int spacing = 50;
+			numOfCodes = 0;
+			for (short errorCode : errorCodes) {
+				numOfCodes++;
+				Code decoded = DataHandler.decodeErrorCode(errorCode);
+				System.out.println("Found Error Code: " + Short.toString(decoded.ID) + " : " + decoded.Description);
+				Option newOption = new Option(Short.toString(decoded.ID) + " : " + decoded.Description,
+						x, y,500,40,decoded) {
+					@Override
+					public void action() {
+						System.out.println("Activating Button Action                                               *");
+						running = false;
+						onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "detailPanel");
+						onBoardDisplay.detailPanel.setItem(decoded);
+						onBoardDisplay.detailPanel.startRun();
+					}
+				};
+				shownCodes.add(newOption);
+				y = y + spacing;
+			}
 			//TODO Add scan running stuff here to collect data and prepare for painting.
 		}
 		
@@ -158,6 +200,30 @@ public class ErrorCodes {
                         onBoardDisplay.ModifyAspectY(option.yPosition+option.height-20));
                 //The adding is needed above because strings are drawn with
                 //the y co-ordinate as the bottom, not top.
+            }
+            g2d.setFont(new Font("Gill Sans", Font.BOLD ,
+                    onBoardDisplay.ModifyAspect(20)));
+            if (numOfCodes > 0) {
+	            for (Option option : shownCodes){
+	                if (option.selected) {
+	                    g2d.setColor(Color.PINK);
+	                    buttonTexture = onBoardDisplay.menuPanel.buttonPressed;
+	                } else {
+	                    g2d.setColor(Color.RED);
+	                    buttonTexture = onBoardDisplay.menuPanel.button;
+	                }
+	                g2d.drawImage(buttonTexture,
+	                        onBoardDisplay.ModifyAspectX(option.xPosition),
+	                        onBoardDisplay.ModifyAspectY(option.yPosition),
+	                        onBoardDisplay.ModifyAspect(option.width),
+	                        onBoardDisplay.ModifyAspect(option.height),
+	                        this);
+	                g2d.drawString(option.currentCaption,
+	                        onBoardDisplay.ModifyAspectX(option.xPosition + 70),
+	                        onBoardDisplay.ModifyAspectY(option.yPosition+option.height-18));
+	                //The adding is needed above because strings are drawn with
+	                //the y co-ordinate as the bottom, not top.
+	            }
             }
 		}
 		

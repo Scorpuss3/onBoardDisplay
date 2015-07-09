@@ -156,7 +156,7 @@ public class Menu {
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsWidth-200),
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsHeight-200));
             g2d.setFont(new Font("Gill Sans", Font.BOLD , onBoardDisplay.ModifyAspect(90)));
-            g2d.drawString("On Board Display", onBoardDisplay.ModifyAspectX((onBoardDisplay.graphicsWidth/2)-380),
+            g2d.drawString("On-Board Display", onBoardDisplay.ModifyAspectX((onBoardDisplay.graphicsWidth/2)-380),
                     onBoardDisplay.ModifyAspectY(80));
             
             g2d.setFont(new Font("Gill Sans", Font.BOLD ,
@@ -206,12 +206,13 @@ public class Menu {
                 this.currentCaption = currentCaption;
             }
             
-            public Option(String currentCaption, int xPosition, int yPosition, int width, int height) {
+            public Option(String currentCaption, int xPosition, int yPosition, int width, int height, Object link) {
             	this.currentCaption = currentCaption;
             	this.xPosition = xPosition;
             	this.yPosition = yPosition;
             	this.width = width;
             	this.height = height;
+            	this.link = link;
             }
             
             public void select() {

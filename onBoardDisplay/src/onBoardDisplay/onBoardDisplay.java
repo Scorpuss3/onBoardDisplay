@@ -18,6 +18,7 @@ public class onBoardDisplay {
 	public static Menu.MenuPanel menuPanel;
 	public static ErrorCodes.ErrorCodePanel errorCodePanel;
 	public static HUD.HUDPanel hudPanel;
+	public static Detail.DetailPanel detailPanel;
 	
 	public static CarInterfacing.CarInterface carInterface;
 	
@@ -75,11 +76,13 @@ public class onBoardDisplay {
 		menuPanel = new Menu.MenuPanel(trueWidth,trueHeight);
 		errorCodePanel = new ErrorCodes.ErrorCodePanel(trueWidth,trueHeight);
 		hudPanel = new HUD.HUDPanel(trueWidth,trueHeight);
+		detailPanel = new Detail.DetailPanel(trueWidth, trueHeight);
 		
 		topLayerPanel = new JPanel(new CardLayout());
 		topLayerPanel.add(menuPanel, "menuPanel");
 		topLayerPanel.add(errorCodePanel,"errorCodePanel");
 		topLayerPanel.add(hudPanel,"hudPanel");
+		topLayerPanel.add(detailPanel,"detailPanel");
 		layout = (CardLayout) (topLayerPanel.getLayout());
 		topLayerPanel.setVisible(true);
 		topLayerFrame.add(topLayerPanel);
