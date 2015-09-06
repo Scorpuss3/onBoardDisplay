@@ -5,6 +5,7 @@ import java.awt.GraphicsEnvironment;
 
 import onBoardDisplay.GUI.*;
 import onBoardDisplay.carInterfacing.*;
+import onBoardDisplay.dataHandling.*;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -21,6 +22,7 @@ public class onBoardDisplay {
 	public static Detail.DetailPanel detailPanel;
 	
 	public static CarInterfacing.CarInterface carInterface;
+	public static DataHandler dataHandler;
 	
 	public static int graphicsWidth = 1280;//Aspect 16:9
 	public static int graphicsHeight = 720;
@@ -72,6 +74,7 @@ public class onBoardDisplay {
 		calculateAspect();
 		
 		carInterface = new CarInterfacing.CarInterface();
+		dataHandler = new DataHandler();
 		
 		menuPanel = new Menu.MenuPanel(trueWidth,trueHeight);
 		errorCodePanel = new ErrorCodes.ErrorCodePanel(trueWidth,trueHeight);
@@ -92,6 +95,7 @@ public class onBoardDisplay {
 		topLayerFrame.setUndecorated(true);
 		topLayerFrame.setVisible(true);
 		System.out.println("Menu setup and class instances set up, Starting run...");
+		
 		menuPanel.startSensing();
 	}
 }
