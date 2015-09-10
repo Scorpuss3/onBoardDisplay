@@ -56,10 +56,18 @@ public class onBoardDisplay {
         return translated;
     }
     
+    public static int ModifyAspectX(float input) {
+    	return ModifyAspectX((int)input);
+    }
+    
     public static int ModifyAspectY(int input) {
         int aspected =(int) (input * graphicsMultiplier);
         int translated = aspected + yOffset;
         return translated;
+    }
+    
+    public static int ModifyAspectY(float input) {
+    	return ModifyAspectX((int)input);
     }
     
     public static int ModifyAspect(int input) {
@@ -67,6 +75,10 @@ public class onBoardDisplay {
         // and widths (these do not need offset).
         int aspected =(int) (input * graphicsMultiplier);
         return aspected;
+    }
+    
+    public static int ModifyAspect(float input) {
+    	return ModifyAspectX((int)input);
     }
 
 	public static void main(String[] args) {

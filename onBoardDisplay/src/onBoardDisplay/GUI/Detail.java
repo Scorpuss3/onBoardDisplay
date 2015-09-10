@@ -21,6 +21,8 @@ import onBoardDisplay.onBoardDisplay;
 import onBoardDisplay.dataHandling.*;
 import onBoardDisplay.dataHandling.DataHandler.Location;
 import onBoardDisplay.GUI.Menu.MenuPanel.Option;
+import onBoardDisplay.GUI.components.dials.DialSkin1;
+import onBoardDisplay.GUI.MyGraphics;
 
 public class Detail {
 	public static class DetailPanel extends JPanel implements MouseListener {
@@ -194,13 +196,11 @@ public class Detail {
                     onBoardDisplay.ModifyAspect(25)));
             String topLine, descriptionLine, minorLocation, majorLocation;
             if (mode == DetailMode.PID) {
-            	//TODO Add painting stuff for detail pane.
             	topLine = "OBDII PID No: " + Short.valueOf(chosenPID.ID).toString();
             	descriptionLine = "Description: " + chosenPID.Description;
             	majorLocation = chosenPID.majorLocation;
             	minorLocation = chosenPID.minorLocation;
             } else {
-            	//TODO Add painting stuff for detail pane.
             	topLine = "Error Code No: " + Short.valueOf(chosenCode.ID).toString();
             	descriptionLine = "Description: " + chosenCode.Description;
             	majorLocation = chosenCode.majorLocation;
@@ -264,6 +264,21 @@ public class Detail {
         			height,
         			minorLocation,
         			ImageType.TOP);
+        	DialSkin1 myDial = new DialSkin1(100,350,200,200,0,180,(float)0.8);
+        	myDial.update(0,"degrees");
+        	myDial.draw(g2d, this);
+        	myDial.update(90,"degrees");
+        	myDial.draw(g2d, this);
+        	myDial.update(180,"degrees");
+        	myDial.draw(g2d, this);
+        	myDial.update(45,"degrees");
+        	myDial.draw(g2d, this);
+        	myDial.update(135,"degrees");
+        	myDial.draw(g2d, this);
+        	//DialSkin1 myDial2 = new DialSkin1(400,100,200,200,0,6000);
+        	//myDial2.update(1500,"rpm");
+        	//myDial2.draw(g2d, this);
+        	//g2d.drawImage(MyGraphics.scaleImageFromText("TEST TEXT",200,300),500,0,200,300,this);
 		}
 		
 		private static void drawPinpoint(Graphics2D g2d, int imgX, int imgY, int imgWidth, int imgHeight, String minorLocationName, ImageType imgType) {
@@ -272,7 +287,7 @@ public class Detail {
 			System.out.print("Pinpoint locs: ");
 			System.out.print(minorLocation.xPos);
 			System.out.print(minorLocation.yPos);
-			System.out.print(minorLocation.zPos);
+			System.out.println(minorLocation.zPos);
 			if (imgType == ImageType.FRONT) {
 				pinX = imgX + (imgWidth * minorLocation.xPos)/100;
 				pinY = imgY + (imgHeight * minorLocation.yPos)/100;
