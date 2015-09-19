@@ -106,7 +106,12 @@ public class onBoardDisplay {
 		topLayerFrame.setSize(trueWidth,trueHeight);
 		topLayerFrame.setUndecorated(true);
 		topLayerFrame.setVisible(true);
+		//TODO Remove the test stuff below...
 		System.out.println("Menu setup and class instances set up, Starting run...");
+		System.out.print("Byte position location test: 01010000 position 3: ");
+		byte[] bAr = {0x50};
+		System.out.println(DataHandler.getBit(bAr,3));
+		carInterface.getSupportedPIDs();
 		
 		menuPanel.startSensing();
 	}

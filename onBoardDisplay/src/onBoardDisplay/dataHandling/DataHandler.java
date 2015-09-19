@@ -4,12 +4,15 @@ import java.awt.Image;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
 
 public class DataHandler {
+	public static char[] hexChars = "0123456789ABCDEF".toCharArray();
+	public Map<Byte,Boolean> supportedPIDs = new LinkedHashMap<Byte,Boolean>();//total number PIDs 225
 	public static Image unknownTextureFront, unknownTextureSide, unknownTextureTop,
 	exhTextureFront, exhTextureSide, exhTextureTop,
 	getTextureFront, getTextureSide, getTextureTop,
@@ -91,6 +94,25 @@ public class DataHandler {
 	public static Code decodeErrorCode (short code) {
 		//TODO Add error code decoding.
 		return new Code((short)1,"A Made up Code","UNK", "Steering Wheel");
+	}
+	
+	public static boolean getBit(byte[] byteArray, int position) {
+		int byteNumber = position / 8;
+		//int startingBitValue = (int) Math.pow(2,byteNumber*8 + 1);
+		//int precedingTotal = startingBitValue - 1;
+		int bytePosition = 8 - ((position % 8)+1);
+		int bitValue = (int) Math.pow(2,bytePosition);
+		if ((byteArray[byteNumber] & (byte)bitValue) == (byte)bitValue) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public static String getHexCharacters(byte b) {
+		int bytePart1 = ((byte)(b >>> 4) & 0x0F);
+		int bytePart2 = (b & 0x0F);
+		return ((Character)hexChars[bytePart1]).toString() + ((Character)hexChars[bytePart2]).toString(); 
 	}
 	
 	public void loadCarResources(String resourceName) {
