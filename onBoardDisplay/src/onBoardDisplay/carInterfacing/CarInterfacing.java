@@ -116,7 +116,7 @@ public class CarInterfacing {
 		public byte[] submitToECU(Byte id) {
 			//TODO Sensor Reading stuff.
 			String submitString = Integer.toString(obdMode) + " " + DataHandler.getHexCharacters(id);
-			//System.out.println("ECU Submit String: " + submitString);
+			System.out.println("ECU Submit String: " + submitString);
 			//ECUin.println(submitString);
 			//String response;
 			//try {
