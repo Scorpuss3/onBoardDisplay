@@ -84,9 +84,9 @@ public class onBoardDisplay {
 	public static void main(String[] args) {
 		topLayerFrame = new JFrame();
 		calculateAspect();
-		
-		carInterface = new CarInterfacing.CarInterface();
+
 		dataHandler = new DataHandler();
+		carInterface = new CarInterfacing.CarInterface();
 		
 		menuPanel = new Menu.MenuPanel(trueWidth,trueHeight);
 		errorCodePanel = new ErrorCodes.ErrorCodePanel(trueWidth,trueHeight);
@@ -106,12 +106,6 @@ public class onBoardDisplay {
 		topLayerFrame.setSize(trueWidth,trueHeight);
 		topLayerFrame.setUndecorated(true);
 		topLayerFrame.setVisible(true);
-		//TODO Remove the test stuff below...
-		System.out.println("Menu setup and class instances set up, Starting run...");
-		System.out.print("Byte position location test: 01010000 position 3: ");
-		byte[] bAr = {0x50};
-		System.out.println(DataHandler.getBit(bAr,3));
-		carInterface.getSupportedPIDs();
 		
 		menuPanel.startSensing();
 	}

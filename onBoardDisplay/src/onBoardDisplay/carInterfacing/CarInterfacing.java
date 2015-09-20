@@ -28,13 +28,16 @@ public class CarInterfacing {
 				ECUin = new PrintWriter(dataSocket.getOutputStream(),true);
 				ECUout = new BufferedReader(new InputStreamReader(dataSocket.getInputStream()));
 			} catch (UnknownHostException e) {
-				e.printStackTrace();
+				System.err.println("ERROR: SOCKET CREATION FAILURE");
+				//TODO uncomment this before release
 				//System.exit(1);
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.err.println("ERROR: SOCKET CREATION FAILURE");
+				//TODO uncomment this before release
 				//System.exit(1);
 			}
 			System.out.println("Socket Created");
+			getSupportedPIDs();
 		}
 		
 		private void setMode(int mode) {
@@ -124,7 +127,6 @@ public class CarInterfacing {
 			//		//TODO Handle ECU output...
 			//	}
 			//} catch (IOException e) {
-			//	// TODO Auto-generated catch block
 			//	e.printStackTrace();
 			//}
 			
