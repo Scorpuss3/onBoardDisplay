@@ -109,16 +109,33 @@ public class CarInterfacing {
 			setMode(03);
 			//A single error code can be defined in 2 bytes, which is the size of short.
 			//TODO Error Code reading stuff.
-			return new short[] {
-					(short) 34, //Temporary data.
-					(short) 34,
-					(short) 34
-			};
+			byte[] rawBytes = submitToECU(null);
+			short[] dtcShorts = new short[rawBytes.length/2];
+			int shortCount = 0;
+			boolean toggle = false;
+			byte bufferByte = 0x00;
+			for (byte currentByte : rawBytes) {
+				if (!toggle) {
+					bufferByte = currentByte;
+				} else {
+					dtcShorts[shortCount] = (short) ((bufferByte << 8) | (currentByte & 0xFF));
+					shortCount++;
+				}
+				toggle = !toggle;
+			}
+			System.out.print("Read some DTCs: ");
+			System.out.print(dtcShorts[0]);
+			System.out.println(dtcShorts[1]);
+			return dtcShorts;
 		}
 		
 		public byte[] submitToECU(Byte id) {
 			//TODO Sensor Reading stuff.
-			String submitString = Integer.toString(obdMode) + " " + DataHandler.getHexCharacters(id);
+			if (id != null) {
+				String submitString = Integer.toString(obdMode) + " " + DataHandler.getHexCharacters(id);
+			} else {
+				String submitString = Integer.toString(obdMode);
+			}
 			//System.out.println("ECU Submit String: " + submitString);
 			//ECUin.println(submitString);
 			//String response;
