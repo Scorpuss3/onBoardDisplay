@@ -216,6 +216,7 @@ public class Detail {
                     onBoardDisplay.ModifyAspectX(70),
                     onBoardDisplay.ModifyAspectY(240));
         	
+        	System.out.println("\t\t\t\t\t\t\t*"+majorLocation);
         	Image[] imageSet = DataHandler.majorLocationCodeTextures.get(majorLocation);
         	currentFrontImg = imageSet[0];
         	currentSideImg = imageSet[1];

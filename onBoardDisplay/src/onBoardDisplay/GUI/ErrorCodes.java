@@ -130,9 +130,9 @@ public class ErrorCodes {
 			numOfCodes = 0;
 			for (short errorCode : errorCodes) {
 				numOfCodes++;
-				Code decoded = DataHandler.decodeErrorCode(errorCode);
+				Code decoded = onBoardDisplay.dataHandler.decodeErrorCode(errorCode);
 				System.out.println("Found Error Code: " + Short.toString(decoded.ID) + " : " + decoded.Description);
-				Option newOption = new Option(Short.toString(decoded.ID) + " : " + decoded.Description,
+				Option newOption = new Option(decoded.IDString + " : " + decoded.Description,
 						x, y,500,40,decoded) {
 					@Override
 					public void action() {

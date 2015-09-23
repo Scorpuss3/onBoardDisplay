@@ -84,7 +84,10 @@ public class onBoardDisplay {
 	public static void main(String[] args) {
 		topLayerFrame = new JFrame();
 		calculateAspect();
-
+		
+		System.out.println(Code.getDatabaseID((short)4639));
+		System.out.println(Code.getIDStringFromShort((short)4639));
+		
 		dataHandler = new DataHandler();
 		carInterface = new CarInterfacing.CarInterface();
 		

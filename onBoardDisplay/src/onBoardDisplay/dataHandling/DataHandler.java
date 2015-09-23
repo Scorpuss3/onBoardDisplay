@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.sql.*;
 
 import javax.imageio.ImageIO;
 
@@ -45,10 +46,12 @@ public class DataHandler {
 		//put("DIS", new Image[] {disTextureFront, disTextureSide, disTextureTop});
 		put("UNK", new Image[] {unkTextureFront, unkTextureSide, unkTextureTop});
 	}};
+	private Connection c;
 	
 	public DataHandler() {
 		//TODO Add test to see if using resource pack, then react accordingly.
 		loadCarResources("generic");
+		loadDatabaseConnection();
 	}
 	
 	public static class Location {
@@ -91,10 +94,11 @@ public class DataHandler {
 		return new Location(25,30,40);
 	}
 	
-	public static Code decodeErrorCode (short code) {
-		//TODO Add error code decoding.
-		return new Code((short)1,"A Made up Code","UNK", "Steering Wheel");
-	}
+	//TODO Remove this when possible...
+	//public static Code decodeErrorCode (short code) {
+	//	//TODO Add error code decoding.
+	//	return new Code((short)1,"A Made up Code","UNK", "Steering Wheel");
+	//}
 	
 	public static boolean getBit(byte[] byteArray, int position) {
 		int byteNumber = position / 8;
@@ -147,5 +151,45 @@ public class DataHandler {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public void loadDatabaseConnection () {
+		//http://wiki.ci.uchicago.edu/VDS/VDSDevelopment/UsingSQLite
+		try {
+			c = DriverManager.getConnection("jdbc:sqlite:errorCodes.db");
+			c.setAutoCommit(false);
+			//Statement st = c.createStatement();
+			//int rc = st.executeUpdate( "INSERT INTO x(b) VALUES('qwer')" );
+			//System.out.println( "insert returns " + rc );
+		    //rs.close();
+		    //st.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public Code decodeErrorCode (short id) {
+		Code newCode = new Code();
+		int tableId = Code.getDatabaseID(id);
+		Statement st;
+		try {
+			st = c.createStatement();
+			ResultSet rs = st.executeQuery( "SELECT * FROM Generic WHERE Id = "+Integer.toString(tableId) );
+			while (rs.next()) {
+				newCode.ID = id;
+				newCode.Description = rs.getString(2);//Columns start at 1!!!
+				newCode.IDString = rs.getString(3);
+				newCode.minorLocation = rs.getString(4);
+				newCode.majorLocation = rs.getString(5);
+			}
+			st.close();
+			//c.commit();
+			//c.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return newCode;
 	}
 }
