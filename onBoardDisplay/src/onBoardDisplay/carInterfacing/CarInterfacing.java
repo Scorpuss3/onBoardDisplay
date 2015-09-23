@@ -142,6 +142,7 @@ public class CarInterfacing {
 			//try {
 			//	while ((response = ECUout.readLine()) != null) {
 			//		//TODO Handle ECU output...
+			//		System.out.println(response);
 			//	}
 			//} catch (IOException e) {
 			//	e.printStackTrace();
