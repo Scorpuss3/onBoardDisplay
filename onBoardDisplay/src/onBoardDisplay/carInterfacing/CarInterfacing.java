@@ -159,9 +159,19 @@ public class CarInterfacing {
 			return submitToECU(PID);
 		}
 		
+		public byte[] readPID(byte PID, int mode) {
+			setMode(mode);
+			return submitToECU(PID);
+		}
+		
 		public byte[] readPID(int PIDInt) {
 			byte PID = (byte) PIDInt;
 			return readPID(PID);
+		}
+		
+		public byte[] readPID(int PIDInt, int mode) {
+			byte PID = (byte) PIDInt;
+			return readPID(PID, mode);
 		}
 		
 		public void clearErrorCodes() {
