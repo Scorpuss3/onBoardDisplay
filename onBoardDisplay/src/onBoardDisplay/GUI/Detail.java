@@ -71,10 +71,10 @@ public class Detail {
             int trueYPos = e.getY();
             int xPos = (int)((trueXPos - onBoardDisplay.xOffset)/onBoardDisplay.graphicsMultiplier);
             int yPos = (int)((trueYPos - onBoardDisplay.yOffset)/onBoardDisplay.graphicsMultiplier);
-            System.out.print("Mouse press at "); System.out.print(xPos);
-            System.out.print(","); System.out.println(yPos);
+            //System.out.print("Mouse press at "); System.out.print(xPos);
+            //System.out.print(","); System.out.println(yPos);
             for (Option option : buttons) {
-                System.out.print(option.currentCaption); System.out.print(option.xPosition); System.out.println(option.yPosition);
+                //System.out.print(option.currentCaption); System.out.print(option.xPosition); System.out.println(option.yPosition);
                 if (xPos >= option.xPosition &&
                         (xPos <= (option.xPosition + option.width) &&
                         yPos >= option.yPosition &&

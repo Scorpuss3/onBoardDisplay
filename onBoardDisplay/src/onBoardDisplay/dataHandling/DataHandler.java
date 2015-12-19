@@ -2,6 +2,7 @@ package onBoardDisplay.dataHandling;
 
 import java.awt.Image;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -46,7 +47,7 @@ public class DataHandler {
 		//put("DIS", new Image[] {disTextureFront, disTextureSide, disTextureTop});
 		put("UNK", new Image[] {unkTextureFront, unkTextureSide, unkTextureTop});
 	}};
-	private Connection c;
+	private Connection codeC, PIDC;
 	
 	public DataHandler() {
 		//TODO Add test to see if using resource pack, then react accordingly.
@@ -101,12 +102,12 @@ public class DataHandler {
 	//}
 	
 	public static boolean getBit(byte[] byteArray, int position) {
-		int byteNumber = position / 8;
+		int byteNumber = position / 8;//did not have -1, so index off by 1!
 		//int startingBitValue = (int) Math.pow(2,byteNumber*8 + 1);
 		//int precedingTotal = startingBitValue - 1;
 		int bytePosition = 8 - ((position % 8)+1);
 		int bitValue = (int) Math.pow(2,bytePosition);
-		if ((byteArray[byteNumber] & (byte)bitValue) == (byte)bitValue) {
+		if ((byteArray[byteNumber] & (byte)bitValue) == ((byte)bitValue & (byte)bitValue)) {
 			return true;
 		} else {
 			return false;
@@ -117,6 +118,16 @@ public class DataHandler {
 		int bytePart1 = ((byte)(b >>> 4) & 0x0F);
 		int bytePart2 = (b & 0x0F);
 		return ((Character)hexChars[bytePart1]).toString() + ((Character)hexChars[bytePart2]).toString(); 
+	}
+	
+	public static byte getByteFromHexString(String s) throws RuntimeException {
+		//Will be 2's Compliment now.
+		if (s.length() > 2) {
+			throw new RuntimeException("Can only supply this function for 1 byte at a time. Gave more that 2 hex characters: "+s);
+		}
+		//Turns out there were a few build-in functions I could use together.
+		Byte b = new Byte((byte)Integer.parseInt(s,16));
+		return (byte)b;
 	}
 	
 	public void loadCarResources(String resourceName) {
@@ -156,8 +167,10 @@ public class DataHandler {
 	public void loadDatabaseConnection () {
 		//http://wiki.ci.uchicago.edu/VDS/VDSDevelopment/UsingSQLite
 		try {
-			c = DriverManager.getConnection("jdbc:sqlite:errorCodes.db");
-			c.setAutoCommit(false);
+			codeC = DriverManager.getConnection("jdbc:sqlite:errorCodes.db");
+			codeC.setAutoCommit(false);
+			PIDC = DriverManager.getConnection("jdbc:sqlite:PIDs.db");
+			PIDC.setAutoCommit(false);
 			//Statement st = c.createStatement();
 			//int rc = st.executeUpdate( "INSERT INTO x(b) VALUES('qwer')" );
 			//System.out.println( "insert returns " + rc );
@@ -174,7 +187,7 @@ public class DataHandler {
 		int tableId = Code.getDatabaseID(id);
 		Statement st;
 		try {
-			st = c.createStatement();
+			st = codeC.createStatement();
 			ResultSet rs = st.executeQuery( "SELECT * FROM Generic WHERE Id = "+Integer.toString(tableId) );
 			while (rs.next()) {
 				newCode.ID = id;
@@ -191,5 +204,33 @@ public class DataHandler {
 			e.printStackTrace();
 		}
 		return newCode;
+	}
+	
+	public PID decodePID (byte id) {
+		PID newPID = new PID();
+		int tableId = PID.getDatabaseID(id);
+		Statement st;
+		try {
+			st = PIDC.createStatement();
+			ResultSet rs = st.executeQuery( "SELECT * FROM Mode01 WHERE Id = "+Integer.toString(tableId) );
+			while (rs.next()) {
+				newPID.ID = id;
+				newPID.maxNumOfBytes = rs.getInt(2)+2;//Number stored in database does not include the confirmation of mode & PID sent by the ELM327
+				newPID.min = rs.getInt(3);
+				newPID.max = rs.getInt(4);
+				newPID.unit = rs.getString(5);
+				newPID.IDString = rs.getString(6);
+				newPID.Description = rs.getString(7);//Columns start at 1!!!
+				newPID.minorLocation = "";//TODO add these to database and read from it
+				newPID.majorLocation = "";
+			}
+			st.close();
+			//c.commit();
+			//c.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return newPID;
 	}
 }

@@ -80,13 +80,22 @@ public class onBoardDisplay {
     public static int ModifyAspect(float input) {
     	return ModifyAspectX((int)input);
     }
+    
+    public static void shutdown(int code) {
+    	carInterface.cleanUp();
+    	System.exit(code);
+    }
+    
+    public static void shutdown() {
+    	shutdown(0);
+    }
 
 	public static void main(String[] args) {
 		topLayerFrame = new JFrame();
 		calculateAspect();
 		
 		System.out.println(Code.getDatabaseID((short)4639));
-		System.out.println(Code.getIDStringFromShort((short)4639));
+		System.out.println(Code.getStringFromID((short)4639));
 		
 		dataHandler = new DataHandler();
 		carInterface = new CarInterfacing.CarInterface();
@@ -111,5 +120,6 @@ public class onBoardDisplay {
 		topLayerFrame.setVisible(true);
 		
 		menuPanel.startSensing();
+		DataHandler.getByteFromHexString("FE");
 	}
 }

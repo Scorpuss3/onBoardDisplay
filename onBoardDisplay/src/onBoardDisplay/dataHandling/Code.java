@@ -14,7 +14,7 @@ public class Code {
 	
 	public Code (short ID, String Description, String majorLocation, String minorLocation) {
 		this.ID = ID;
-		this.IDString = getIDStringFromShort(ID);
+		this.IDString = getStringFromID(ID);
 		this.Description = Description;
 		this.majorLocation = majorLocation;
 		this.minorLocation = minorLocation;
@@ -35,8 +35,9 @@ public class Code {
 		return finalInt;
 	}
 	
-	public static String getIDStringFromShort(short srt) {
+	public static String getStringFromID(short srt) {
 		String finalString = "";
+		//TODO Also talk about this in project as a detailed code explanation (and all related code).
 		//Are encoded as described for mode 3 at https://en.wikipedia.org/wiki/OBD-II_PIDs#Mode_3_.28no_PID_required.29
 		finalString += DTCCharacters[(srt>>14)&0x03];//First two bits
 		finalString += hexDigits[(srt>>12)&0x03];//Second two bits

@@ -33,6 +33,12 @@ public class Menu {
                     shownOptions = currentInfoMenu;
                 }
             },
+            new Option("Track Day") {
+                @Override
+                public void action() {
+                    shownOptions = trackDayMenu;
+                }
+            },
             new Option("Error Codes") {
                 @Override
                 public void action() {
@@ -48,7 +54,7 @@ public class Menu {
             new Option("Exit") {
                 @Override
                 public void action() {
-                    System.exit(1);
+                	onBoardDisplay.shutdown();
                 }
             }
         };
@@ -90,6 +96,42 @@ public class Menu {
                     }
                 },
                 //TODO add options for other HUDs.
+                new Option("Back") {
+                    @Override
+                    public void action() {
+                        shownOptions = mainMenu;
+                    }
+                }
+            };
+        
+        protected Option[] trackDayMenu = new Option[] {
+                new Option("0 - 60 & 1/4 Mile") {
+                    @Override
+                    public void action() {
+                        onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "hudPanel");
+                        onBoardDisplay.hudPanel.layout.show(onBoardDisplay.hudPanel.hudTopLayerPanel,"rawReadSpecificPanel");
+                        onBoardDisplay.hudPanel.rawReadSpecificPanel.startRun();
+                        stopSensing();
+                    }
+                },
+                new Option("Leaderboards") {
+                    @Override
+                    public void action() {
+                        onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "hudPanel");
+                        onBoardDisplay.hudPanel.layout.show(onBoardDisplay.hudPanel.hudTopLayerPanel,"cylinderPanel");
+                        onBoardDisplay.hudPanel.cylinderPanel.startRun();
+                        stopSensing();
+                    }
+                },
+                new Option("BHP Calculation") {
+                    @Override
+                    public void action() {
+                        onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "hudPanel");
+                        onBoardDisplay.hudPanel.layout.show(onBoardDisplay.hudPanel.hudTopLayerPanel,"dashPanel");
+                        onBoardDisplay.hudPanel.dashPanel.startRun();
+                        stopSensing();
+                    }
+                },
                 new Option("Back") {
                     @Override
                     public void action() {
@@ -238,10 +280,10 @@ public class Menu {
             int trueYPos = e.getY();
             int xPos = (int)((trueXPos - onBoardDisplay.xOffset)/onBoardDisplay.graphicsMultiplier);
             int yPos = (int)((trueYPos - onBoardDisplay.yOffset)/onBoardDisplay.graphicsMultiplier);
-            System.out.print("Mouse press at "); System.out.print(xPos);
-            System.out.print(","); System.out.println(yPos);
+            //System.out.print("Mouse press at "); System.out.print(xPos);
+            //System.out.print(","); System.out.println(yPos);
             for (Option option : shownOptions) {
-                System.out.print(option.currentCaption); System.out.print(option.xPosition); System.out.println(option.yPosition);
+                //System.out.print(option.currentCaption); System.out.print(option.xPosition); System.out.println(option.yPosition);
                 if (xPos >= option.xPosition &&
                         (xPos <= (option.xPosition + option.width) &&
                         yPos >= option.yPosition &&
@@ -252,6 +294,9 @@ public class Menu {
                 }
             }
             repaint();
+
+            //TODO remove this test script...
+    		onBoardDisplay.carInterface.readPID((byte)0x05, (byte)01, true, 3);
         }
         
         @Override
