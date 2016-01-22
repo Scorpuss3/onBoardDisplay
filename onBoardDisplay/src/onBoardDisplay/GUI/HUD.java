@@ -12,6 +12,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
+import javafx.scene.paint.Color;
 import onBoardDisplay.onBoardDisplay;
 import onBoardDisplay.GUI.HUDLayouts.*;
 

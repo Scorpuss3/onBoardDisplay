@@ -25,7 +25,8 @@ public class Menu {
 	public static class MenuPanel extends JPanel implements MouseListener {
         protected Option[] shownOptions;
         protected boolean sensing = false;
-        protected Image button, buttonPressed;
+        public Image button;
+		public Image buttonPressed;
         protected Option[] mainMenu = new Option[] {
             new Option("Display Readings") {
                 @Override
@@ -80,9 +81,11 @@ public class Menu {
                 new Option("Show Dash") {
                     @Override
                     public void action() {
-                        onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "hudPanel");
-                        onBoardDisplay.hudPanel.layout.show(onBoardDisplay.hudPanel.hudTopLayerPanel,"dashPanel");
-                        onBoardDisplay.hudPanel.dashPanel.startRun();
+                        //onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "hudPanel");
+                        //onBoardDisplay.hudPanel.layout.show(onBoardDisplay.hudPanel.hudTopLayerPanel,"dashPanel");
+                        //onBoardDisplay.hudPanel.dashPanel.startRun();
+                    	onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "dashPanel");
+                    	onBoardDisplay.dashPanel.startRun();
                         stopSensing();
                     }
                 },
@@ -235,14 +238,14 @@ public class Menu {
             }
         }
     
-        static class Option{
-            protected String currentCaption;
-            protected int xPosition;
-            protected int yPosition;
-            protected int width = 400;//a test comment.
-            protected int height = 60;
-            protected boolean selected;
-            protected Object link; //For optional extra use.
+        public static class Option{
+            public String currentCaption;
+            public int xPosition;
+            public int yPosition;
+            public int width = 400;//a test comment.
+            public int height = 60;
+            public boolean selected;
+            public Object link; //For optional extra use.
             
             public Option (String currentCaption) {
                 this.currentCaption = currentCaption;

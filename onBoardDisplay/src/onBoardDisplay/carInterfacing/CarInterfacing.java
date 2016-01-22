@@ -133,11 +133,11 @@ public class CarInterfacing {
 		
 		public short[] getErrorCodes() {
 			if (networkMode == 0) {
-				short[] empty = new short[] {};
-				return empty;
+				short[] fakeShorts ={(short) 2,(short) 24, (short) 10};
+				return fakeShorts;
 			}
 			//A single error code can be defined in 2 bytes, which is the size of short.
-			//TODO Error Code reading stuff.
+			//TODO Error Code reading stuff. Uncomment below
 			int numOfErrors = getNumOfErrors();
 			byte[] rawBytes = submitToECU("03",numOfErrors+2);
 			short[] dtcShorts = new short[rawBytes.length/2];
@@ -253,6 +253,8 @@ public class CarInterfacing {
 		}
 		
 		public byte[] readPID(byte PID, byte mode, boolean autoRetry, int expectedBytes) {
+			/* Returns the raw bytes of the PID asked for, and makes sure that some data is recieved if required.
+			 * Also checks against expected number of bytes.*/
 			setMode(mode);
 			String submitString = DataHandler.getHexCharacters(obdMode) + " " + DataHandler.getHexCharacters(PID);
 			//Adding a 1 to the end may increase speed according to
@@ -291,7 +293,7 @@ public class CarInterfacing {
 				} else {
 					//TODO change this to do something more useful than just be 0. The -2 is so that you remove mode and PID
 					byte[] ba = new byte[expectedBytes-2];// Probably covers everything
-					for (int ii = 0; ii <= expectedBytes-2; ii++) {
+					for (int ii = 0; ii < expectedBytes-2; ii++) {
 						ba[ii] = (byte)0;
 					}
 					return ba;

@@ -10,11 +10,12 @@ import javax.swing.JPanel;
 
 import onBoardDisplay.onBoardDisplay;
 import onBoardDisplay.GUI.components.Dial;
+import onBoardDisplay.dataHandling.PID;
 
 public class DialSkin1 extends Dial{
-	public DialSkin1(int startX, int startY, int realWidth, int realHeight, int min, int max, float circleProportion) {
-		super(startX, startY, 400, 400, realWidth, realHeight);
-		Text t1 = new Text("Dial 1",20,"Gill Sans",Color.GREEN,150,100);
+	public DialSkin1(PID pid, int startX, int startY, int realWidth, int realHeight, int min, int max, float circleProportion) {
+		super(pid, startX, startY, 400, 400, realWidth, realHeight);
+		Text t1 = new Text(pid.Description,20,"Gill Sans",Color.GREEN,150,100);
 		Text t2 = new Text("NODATA",15,"Gill Sans",Color.GREEN,140,370);
 		Text[] tArray = {t1,t2};
 		this.texts = tArray;
@@ -28,8 +29,9 @@ public class DialSkin1 extends Dial{
 		this.images = iArray;
 	}
 	
-	public void update(int reading, String unit) {
-		texts[1].displayText = Integer.toString(reading) + " " + unit;
+	public void update(float reading, String unit) {
+		String stringReading = Float.toString(reading);
+		texts[1].displayText = stringReading + " " + unit;
 		pins[0].update(reading);
 	}
 	
@@ -56,9 +58,9 @@ public class DialSkin1 extends Dial{
 		Stroke old = g2d.getStroke();
 		g2d.setStroke(new BasicStroke(pins[0].width*xMod));
 		g2d.drawLine(onBoardDisplay.ModifyAspectX(startX + (pins[0].endX) * xMod),
-				onBoardDisplay.ModifyAspectX(startY + (pins[0].endY) * yMod),
+				onBoardDisplay.ModifyAspectY(startY + (pins[0].endY) * yMod),
 				onBoardDisplay.ModifyAspectX(startX + (pins[0].originX) * xMod),
-				onBoardDisplay.ModifyAspectX(startY + (pins[0].originX) * yMod));
+				onBoardDisplay.ModifyAspectY(startY + (pins[0].originX) * yMod));
 		g2d.setStroke(old);
 	}
 }

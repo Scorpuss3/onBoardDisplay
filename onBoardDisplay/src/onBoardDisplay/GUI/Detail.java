@@ -151,7 +151,7 @@ public class Detail {
 		@Override
         public void paint(Graphics g) {
             super.paint(g);
-            System.out.println("Painting....");
+            //System.out.println("Painting....");
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                     RenderingHints.VALUE_ANTIALIAS_ON);
@@ -201,7 +201,7 @@ public class Detail {
             	majorLocation = chosenPID.majorLocation;
             	minorLocation = chosenPID.minorLocation;
             } else {
-            	topLine = "Error Code No: " + Short.valueOf(chosenCode.ID).toString();
+            	topLine = "Error Code No: " + chosenCode.IDString;
             	descriptionLine = "Description: " + chosenCode.Description;
             	majorLocation = chosenCode.majorLocation;
             	minorLocation = chosenCode.minorLocation;
@@ -265,17 +265,18 @@ public class Detail {
         			height,
         			minorLocation,
         			ImageType.TOP);
-        	DialSkin1 myDial = new DialSkin1(100,350,200,200,0,180,(float)0.8);
-        	myDial.update(0,"degrees");
-        	myDial.draw(g2d, this);
-        	myDial.update(90,"degrees");
-        	myDial.draw(g2d, this);
-        	myDial.update(180,"degrees");
-        	myDial.draw(g2d, this);
-        	myDial.update(45,"degrees");
-        	myDial.draw(g2d, this);
-        	myDial.update(135,"degrees");
-        	myDial.draw(g2d, this);
+        	//DialSkin1 myDial = new DialSkin1(new PID(),100,350,200,200,0,180,(float)0.8);
+        	//myDial.update(0,"degrees");
+        	//myDial.draw(g2d, this);
+        	//myDial.update(90,"degrees");
+        	//myDial.draw(g2d, this);
+        	//myDial.update(180,"degrees");
+        	//myDial.draw(g2d, this);
+        	//myDial.update(45,"degrees");
+        	//myDial.draw(g2d, this);
+        	//myDial.update(135,"degrees");
+        	//myDial.draw(g2d, this);
+        	
         	//DialSkin1 myDial2 = new DialSkin1(400,100,200,200,0,6000);
         	//myDial2.update(1500,"rpm");
         	//myDial2.draw(g2d, this);
@@ -283,7 +284,7 @@ public class Detail {
 		}
 		
 		private static void drawPinpoint(Graphics2D g2d, int imgX, int imgY, int imgWidth, int imgHeight, String minorLocationName, ImageType imgType) {
-			Location minorLocation = DataHandler.getMinorLocation(minorLocationName);
+			Location minorLocation = onBoardDisplay.dataHandler.getMinorLocation(onBoardDisplay.vehicleName, minorLocationName);
 			int pinX,pinY;
 			System.out.print("Pinpoint locs: ");
 			System.out.print(minorLocation.xPos);
@@ -300,21 +301,23 @@ public class Detail {
 				pinY = imgY + (imgHeight * minorLocation.xPos)/100;
 			}
 			//Vertical line
-			g2d.drawLine(onBoardDisplay.ModifyAspectX(pinX),
-					onBoardDisplay.ModifyAspectY(imgY),
-					onBoardDisplay.ModifyAspectX(pinX),
-					onBoardDisplay.ModifyAspectY(imgY + imgHeight));
-			//Horizontal Line
-			g2d.drawLine(onBoardDisplay.ModifyAspectX(imgX),
-					onBoardDisplay.ModifyAspectY(pinY),
-					onBoardDisplay.ModifyAspectX(imgX + imgWidth),
-					onBoardDisplay.ModifyAspectY(pinY));
-			//Pinpoint Circle
-			int cirRad = 2;
-			g2d.drawOval(onBoardDisplay.ModifyAspectX(pinX-cirRad),
-					onBoardDisplay.ModifyAspectY(pinY-cirRad),
-					onBoardDisplay.ModifyAspect(cirRad*2),
-					onBoardDisplay.ModifyAspect(cirRad*2));
+			if(!(minorLocation.xPos==0 && minorLocation.yPos==0 && minorLocation.zPos==0)) {
+				g2d.drawLine(onBoardDisplay.ModifyAspectX(pinX),
+						onBoardDisplay.ModifyAspectY(imgY),
+						onBoardDisplay.ModifyAspectX(pinX),
+						onBoardDisplay.ModifyAspectY(imgY + imgHeight));
+				//Horizontal Line
+				g2d.drawLine(onBoardDisplay.ModifyAspectX(imgX),
+						onBoardDisplay.ModifyAspectY(pinY),
+						onBoardDisplay.ModifyAspectX(imgX + imgWidth),
+						onBoardDisplay.ModifyAspectY(pinY));
+				//Pinpoint Circle
+				int cirRad = 2;
+				g2d.drawOval(onBoardDisplay.ModifyAspectX(pinX-cirRad),
+						onBoardDisplay.ModifyAspectY(pinY-cirRad),
+						onBoardDisplay.ModifyAspect(cirRad*2),
+						onBoardDisplay.ModifyAspect(cirRad*2));
+			}
 		}
 		
 		public DetailPanel(int width,int height) {

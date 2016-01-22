@@ -47,7 +47,7 @@ public class DataHandler {
 		//put("DIS", new Image[] {disTextureFront, disTextureSide, disTextureTop});
 		put("UNK", new Image[] {unkTextureFront, unkTextureSide, unkTextureTop});
 	}};
-	private Connection codeC, PIDC;
+	private Connection codeC, PIDC, locationC;
 	
 	public DataHandler() {
 		//TODO Add test to see if using resource pack, then react accordingly.
@@ -90,9 +90,29 @@ public class DataHandler {
 		return description;
 	}
 	
-	public static Location getMinorLocation (String locationName) {
+	public Location getMinorLocation (String vehicleName, String locationName) {
 		//TODO Add location database for Error Codes and PIDs
-		return new Location(25,30,40);
+		//in percentages...
+		int x=0, y=0, z=0;
+		Statement st;
+		try {
+			st = locationC.createStatement();
+			System.out.println("Searching database for location of " + locationName + " in " + vehicleName);
+			ResultSet rs = st.executeQuery( "SELECT * FROM "+ vehicleName +" WHERE LocationName = '"+locationName+"'" );
+			while (rs.next()) {
+				x = rs.getInt(2);//Columns start at 1!!!
+				y = rs.getInt(3);
+				z = rs.getInt(4);
+			}
+			st.close();
+			//c.commit();
+			//c.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.print("Location of Component found: "); System.out.print(x); System.out.print(y); System.out.println(z);
+		return new Location(x,y,z);
 	}
 	
 	//TODO Remove this when possible...
@@ -171,6 +191,8 @@ public class DataHandler {
 			codeC.setAutoCommit(false);
 			PIDC = DriverManager.getConnection("jdbc:sqlite:PIDs.db");
 			PIDC.setAutoCommit(false);
+			locationC = DriverManager.getConnection("jdbc:sqlite:MinorLocations.db");
+			locationC.setAutoCommit(false);
 			//Statement st = c.createStatement();
 			//int rc = st.executeUpdate( "INSERT INTO x(b) VALUES('qwer')" );
 			//System.out.println( "insert returns " + rc );
@@ -207,20 +229,29 @@ public class DataHandler {
 	}
 	
 	public PID decodePID (byte id) {
+		/* Decodes the data from the PID database so that it can be used in the PID class*/
 		PID newPID = new PID();
 		int tableId = PID.getDatabaseID(id);
 		Statement st;
 		try {
 			st = PIDC.createStatement();
 			ResultSet rs = st.executeQuery( "SELECT * FROM Mode01 WHERE Id = "+Integer.toString(tableId) );
-			while (rs.next()) {
+			while (rs.next()) {//Should only ever loop through once...
 				newPID.ID = id;
 				newPID.maxNumOfBytes = rs.getInt(2)+2;//Number stored in database does not include the confirmation of mode & PID sent by the ELM327
 				newPID.min = rs.getInt(3);
 				newPID.max = rs.getInt(4);
 				newPID.unit = rs.getString(5);
 				newPID.IDString = rs.getString(6);
-				newPID.Description = rs.getString(7);//Columns start at 1!!!
+				newPID.Description = rs.getString(7);//Columns start at 1!!
+				//TODO Missed out status colours
+				newPID.isBitEncoded = rs.getInt(9)==1;
+				String[] rawParameters = new String[4];
+				rawParameters[0] = rs.getString(10);
+				rawParameters[1] = rs.getString(11);
+				rawParameters[2] = rs.getString(12);
+				rawParameters[3] = rs.getString(13);
+				newPID.conversionParameters = convertMessyNumbers(rawParameters);
 				newPID.minorLocation = "";//TODO add these to database and read from it
 				newPID.majorLocation = "";
 			}
@@ -232,5 +263,59 @@ public class DataHandler {
 			e.printStackTrace();
 		}
 		return newPID;
+	}
+	
+	public float[] convertMessyNumbers(String[] rawStrings) {
+		float[] finalParameters = new float[5];
+		for (int i = 0; i < rawStrings.length; i++) {
+			if (rawStrings[i].equals("B")) {
+				finalParameters[i] = 0;
+				finalParameters[4] = 1; 
+			} else {
+				String workString = rawStrings[i];
+				boolean negative = false;
+				float numerator = 0;
+				float denominator = 0;
+				if (workString.substring(0, 1)== "-") {
+					negative = true;
+					workString = workString.substring(1,workString.length());
+				}
+				int divisorIndex = workString.indexOf("/");
+				if (-1 == divisorIndex) {
+					//Division symbol not found
+					numerator = Float.parseFloat(workString);
+					denominator = 1;
+				} else {
+					numerator = Float.parseFloat(workString.substring(0,divisorIndex));
+					denominator = Float.parseFloat(workString.substring(divisorIndex + 1, workString.length()));
+				}
+				finalParameters[i] = numerator/denominator;
+				if (negative) {
+					finalParameters[i] *= -1;
+				}
+			}
+		}
+		return finalParameters;
+	}
+	
+	public float decodePIDRead(byte[] rawBytes, PID pid) {
+		/* converts the raw data from the ECU into recognisable information.
+		 * The PIds used with this method should be direct conversions, not bit-encoded,
+		 * which is why there is a check. The bit-encoded ones should be used with raw data
+		 * where they are needed. I am assuming in this method that there are only two bytes,
+		 * A and B, which should be true.
+		 * The method also uses ints instead of bytes, and PIDs' raw data is not 2's compliment,
+		 * so would be messed up if i tried to push values into byte types before float.
+		 */
+		float workValue = rawBytes[0] * pid.conversionParameters[0];
+		if (pid.conversionParameters[4] == 1) {
+			//B is used
+			workValue += rawBytes[1];
+		} else {
+			workValue += pid.conversionParameters[1];
+		}
+		workValue *= pid.conversionParameters[2];
+		workValue += pid.conversionParameters[3];
+		return workValue;
 	}
 }

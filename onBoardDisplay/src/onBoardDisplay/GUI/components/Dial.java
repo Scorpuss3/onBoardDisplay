@@ -7,8 +7,11 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import onBoardDisplay.dataHandling.PID;
+
 public class Dial {	
 	//All components' locations are specified as proportions of generic sizes shown (including width and height) for scalability.
+	public PID pid;
 	public int genericWidth, genericHeight;
 	public int startX, startY;
 	public float xMod, yMod, fontMod;//Font needs separate modifier, currently calculated from width mod.
@@ -16,7 +19,8 @@ public class Dial {
 	protected Text[] texts;
 	protected Pin[] pins;
 	
-	public Dial(int startX, int startY, int genericHeight, int genericWidth, int realWidth, int realHeight) {
+	public Dial(PID pid, int startX, int startY, int genericHeight, int genericWidth, int realWidth, int realHeight) {
+		this.pid = pid;
 		this.startX = startX;
 		this.startY = startY;
 		this.genericWidth = genericWidth;//Larger numbers encouraged for detail, but mainly here for proportions.
@@ -46,7 +50,7 @@ public class Dial {
 			this.width = width;
 		}
 		
-		public void update(int reading) {
+		public void update(float reading) {
 			float asProportion = reading / (float)(max-min);
 			int angle,angleFromDown,xDirection,yDirection,modX,modY;
 			float circleProportionBelowOrigin = (circleProportion-(float)0.5)/2;

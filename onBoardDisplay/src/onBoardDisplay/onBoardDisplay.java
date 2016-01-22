@@ -4,6 +4,7 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 
 import onBoardDisplay.GUI.*;
+import onBoardDisplay.GUI.HUDLayouts.Dash;
 import onBoardDisplay.carInterfacing.*;
 import onBoardDisplay.dataHandling.*;
 
@@ -21,8 +22,12 @@ public class onBoardDisplay {
 	public static HUD.HUDPanel hudPanel;
 	public static Detail.DetailPanel detailPanel;
 	
+	public static Dash.DashPanel dashPanel;
+	
 	public static CarInterfacing.CarInterface carInterface;
 	public static DataHandler dataHandler;
+	
+	public static String vehicleName = "VOLKSWAGENPOLO6N214";//"Generic"
 	
 	public static int graphicsWidth = 1280;//Aspect 16:9
 	public static int graphicsHeight = 720;
@@ -102,14 +107,18 @@ public class onBoardDisplay {
 		
 		menuPanel = new Menu.MenuPanel(trueWidth,trueHeight);
 		errorCodePanel = new ErrorCodes.ErrorCodePanel(trueWidth,trueHeight);
-		hudPanel = new HUD.HUDPanel(trueWidth,trueHeight);
+		//hudPanel = new HUD.HUDPanel(trueWidth,trueHeight);
 		detailPanel = new Detail.DetailPanel(trueWidth, trueHeight);
+		
+		dashPanel = new Dash.DashPanel(trueWidth,trueHeight);
 		
 		topLayerPanel = new JPanel(new CardLayout());
 		topLayerPanel.add(menuPanel, "menuPanel");
 		topLayerPanel.add(errorCodePanel,"errorCodePanel");
-		topLayerPanel.add(hudPanel,"hudPanel");
+		//topLayerPanel.add(hudPanel,"hudPanel");
 		topLayerPanel.add(detailPanel,"detailPanel");
+		topLayerPanel.add(dashPanel,"dashPanel");
+		
 		layout = (CardLayout) (topLayerPanel.getLayout());
 		topLayerPanel.setVisible(true);
 		topLayerFrame.add(topLayerPanel);
@@ -120,6 +129,11 @@ public class onBoardDisplay {
 		topLayerFrame.setVisible(true);
 		
 		menuPanel.startSensing();
-		DataHandler.getByteFromHexString("FE");
+		System.out.println("Testing PID Decode...");
+		PID pid = dataHandler.decodePID((byte)0x10);
+		byte[] fakeBytes = {(byte)0x0A,(byte)0x14};
+		float f = dataHandler.decodePIDRead(fakeBytes, pid);
+		System.out.println(f);
+		
 	}
 }

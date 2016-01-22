@@ -123,7 +123,9 @@ public class ErrorCodes {
         }
 		
 		public void runScan() {
+			System.out.println("Now running error code scan");
 			short[] errorCodes = onBoardDisplay.carInterface.getErrorCodes();
+			System.out.print("Num of error codes read: "); System.out.println(errorCodes.length);
 			int x = 65;
 			int y = 110;
 			int spacing = 50;
@@ -132,7 +134,13 @@ public class ErrorCodes {
 				numOfCodes++;
 				Code decoded = onBoardDisplay.dataHandler.decodeErrorCode(errorCode);
 				System.out.println("Found Error Code: " + Short.toString(decoded.ID) + " : " + decoded.Description);
-				Option newOption = new Option(decoded.IDString + " : " + decoded.Description,
+				String shortDescription;
+				try {
+					shortDescription = decoded.Description.substring(0,30);
+				} catch (java.lang.NullPointerException e) {
+					shortDescription = null;
+				}
+				Option newOption = new Option(decoded.IDString + " : " + shortDescription,
 						x, y,500,40,decoded) {
 					@Override
 					public void action() {

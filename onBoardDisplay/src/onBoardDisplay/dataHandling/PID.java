@@ -10,6 +10,8 @@ public class PID {
 	public int max;
 	public String majorLocation;
 	public String minorLocation;
+	public boolean isBitEncoded;
+	public float[] conversionParameters = new float[5];//5 are used because the last one is 1 if byte B is used rather than parameter 2.
 	
 	public PID (byte ID, String Description, String majorLocation, String minorLocation, int maxNumOfBytes) {
 		this.ID = ID;
