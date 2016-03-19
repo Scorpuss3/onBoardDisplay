@@ -23,59 +23,52 @@ import onBoardDisplay.GUI.Menu;
 import onBoardDisplay.GUI.HUDLayouts.Dash.DashPanel.UpdateLoop;
 import onBoardDisplay.GUI.Menu.MenuPanel.Option;
 import onBoardDisplay.GUI.components.dials.DialSkin1;
-import onBoardDisplay.GUI.components.dials.GraphWidget;
 import onBoardDisplay.dataHandling.Code;
 import onBoardDisplay.dataHandling.DataHandler;
 import onBoardDisplay.dataHandling.PID;
 
-public class Graph {
-	public static class GraphPanel extends JPanel implements MouseListener {
+public class TrackTest {
+	public static class TrackTestPanel extends JPanel implements MouseListener {
 		private boolean running = false;
+		private String currentMode = "0-60";
 		private boolean recording = false;
-		private static PID[] pidList = {onBoardDisplay.dataHandler.decodePID((byte)0x0C),
-				onBoardDisplay.dataHandler.decodePID((byte)0x05),
-				onBoardDisplay.dataHandler.decodePID((byte)0x0B),
-				onBoardDisplay.dataHandler.decodePID((byte)0x0D),
-				};
-		private String statusString = "Not Recording";
-		private UpdateLoop graphUpdateLoop;// = new UpdateLoop();
+		private boolean scanning = false;
+		private boolean motionWaiting = false;
+		private float currentSpeed = 0;
+		private float currentDistance = 0;
+		private float startDistance = 0;
+		private String statusString = "Waiting for speed to get to 0...";
+		private UpdateLoop trackTestUpdateLoop = new UpdateLoop();
 		private long startTime = 0;
-		private GraphWidget graph = new GraphWidget(pidList,100,180,700,600,200);
+		private ArrayList<Double> times = new ArrayList<>();
 		private Menu.MenuPanel.Option[] buttons = new Menu.MenuPanel.Option[] {
 			new Menu.MenuPanel.Option("Start Recording",55,onBoardDisplay.graphicsHeight-60-55,350,60,null) {
 				@Override
 				public void action() {
-					if (recording) {
+					if (scanning) {
 						this.currentCaption = "Start Recording";
+						scanning = false;
 						recording = false;
-						statusString = "Not Recording";
+						motionWaiting = false;
+						statusString = "Waiting for speed to get to 0...";
 						System.out.println("Stopped scanning");
 					} else {
 						this.currentCaption = "Stop Recording";
-						recording = true;
-						startTime = System.currentTimeMillis();
-						statusString = "Recording";
+						scanning = true;
 						System.out.println("Started scanning");
-						graph.clear();
 					}
 				}
 			},
-			new Menu.MenuPanel.Option("Select PIDs",55+400+5,onBoardDisplay.graphicsHeight-60-55,350,60,null) {
+			new Menu.MenuPanel.Option("Mode: "+currentMode,55+400+5,onBoardDisplay.graphicsHeight-60-55,350,60,null) {
 				@Override
 				public void action() {
-					//TODO Add graphing PID selection
-					PID[] selected = onBoardDisplay.dataHandler.selectSupportedPIDsDialog(4);
-					try {
-						if (selected[1]!=null) {
-							pidList = selected;
-							graph = new GraphWidget(pidList,100,180,700,600,200);
-						} else {
-							System.out.println("Tried to create list with null PIDs, ignored...");
-						}
-					} catch (Exception e) {
-						System.out.println("Tried to create list with null PIDs, ignored...");
+					if (currentMode == "0-60") {
+						currentMode = "1/4 Mile";
+						this.currentCaption  = "Mode: "+currentMode; 
+					} else {
+						currentMode = "0-60";
+						this.currentCaption  = "Mode: "+currentMode;
 					}
-					return;
 				}
 			},
 			new Menu.MenuPanel.Option("Exit",55+800+10,onBoardDisplay.graphicsHeight-60-55,350,60,null) {
@@ -148,23 +141,84 @@ public class Graph {
         }
 		
 		class UpdateLoop implements Runnable {
-	        private Thread graphLoop;
+	        private Thread trackTestLoop;
 	        @Override
 	        public void run() {
-	        	int i = 0;
 	            while (true)  {//TODO change this so that it can be deactivated at program close later.
-	            	if (running && recording) {
-	            		System.out.println("now refreshing");
-	            		long time = System.currentTimeMillis()-startTime;
-						graph.update(time);
-						onBoardDisplay.graphPanel.repaint();
-						//try {
-						//	Thread.sleep(200);
-						//} catch (InterruptedException e) {
-						//	// TODO Auto-generated catch block
-						//	e.printStackTrace();
-						//}
-		            } else {//Keeps the while loop from garbage collecting itself.
+	            	if (scanning) {
+	            		PID pid = onBoardDisplay.dataHandler.decodePID((byte)0x0D);
+	            		currentSpeed = onBoardDisplay.dataHandler.decodePIDRead(onBoardDisplay.carInterface.readPID(pid.ID,false),pid);
+    					PID pid2 = onBoardDisplay.dataHandler.decodePID((byte)0x21);
+	            		currentDistance = onBoardDisplay.dataHandler.decodePIDRead(onBoardDisplay.carInterface.readPID(pid2.ID,false),pid2);
+	            		repaint();
+	    				if (currentMode == "0-60") {
+	    					if (recording) {//waiting for reaching 60
+	    						if (currentSpeed >= 10) {
+	    							long endTime = System.currentTimeMillis();
+	    							double elapsed = (endTime - startTime)/(double)1000;//changed to double to stop rounding!!
+	    							System.out.print("\t\t\t\t\t\tSet a new " + currentMode + " time: ");
+	    							System.out.println(elapsed);
+	    							statusString = "Set a new " + currentMode + " time: " + String.valueOf(elapsed);
+	    							times.add(elapsed);
+	    							recording = false;
+	    						}
+	    					} else {
+	    						if (motionWaiting && currentSpeed > 0) {
+	    							startTime = System.currentTimeMillis();
+	    							System.out.println("Started moving, waiting for 60...");
+	    							statusString = "Started moving, waiting for 60...";
+	    							motionWaiting = false;
+	    							recording = true;
+	    						} else if (currentSpeed == 0 && !motionWaiting) {
+	    							motionWaiting = true;
+	    							System.out.println("Reached 0mph, waiting for vehicle motion before clock started...");
+	    							statusString = "Reached 0mph, waiting for vehicle motion before clock started...";
+	    							motionWaiting = true;
+	    						}
+	    					}
+	    				} else {
+	    					//TODO add 1/4 mile stuff.
+	    					if (recording) {//waiting for reaching 60
+	    						float tripDistance = currentDistance - startDistance;
+	    						if (tripDistance >= 0.4) {
+	    							long endTime = System.currentTimeMillis();
+	    							double elapsed = (endTime - startTime)/(double)1000;//changed to double to stop rounding!!
+	    							System.out.print("\t\t\t\t\t\tSet a new " + currentMode + " time: ");
+	    							System.out.println(elapsed);
+	    							statusString = "Set a new " + currentMode + " time: " + String.valueOf(elapsed);
+	    							times.add(elapsed);
+	    							if (elapsed < onBoardDisplay.dataHandler.getBottomLeaderBoard(onBoardDisplay.dataHandler.leaderboard014)) {
+	    								onBoardDisplay.dataHandler.leaderboard014.put(elapsed,onBoardDisplay.profileName);
+	    								onBoardDisplay.dataHandler.leaderboard014.remove(onBoardDisplay.dataHandler.getBottomLeaderBoard(onBoardDisplay.dataHandler.leaderboard014));
+	    								onBoardDisplay.dataHandler.saveLeaderBoards();
+	    								System.out.println("Added item to leaderboard...");
+	    							}
+	    							recording = false;
+	    						}
+	    					} else {
+	    						if (motionWaiting && currentSpeed > 0) {
+	    							startTime = System.currentTimeMillis();
+	    							System.out.println("Started moving, waiting for 60...");
+	    							statusString = "Started moving, waiting for 60...";
+	    							motionWaiting = false;
+	    							recording = true;
+	    							startDistance = onBoardDisplay.dataHandler.decodePIDRead(onBoardDisplay.carInterface.readPID(pid2.ID,false),pid2);
+	    						} else if (currentSpeed == 0 && !motionWaiting) {
+	    							motionWaiting = true;
+	    							System.out.println("Reached 0mph, waiting for vehicle motion before clock started...");
+	    							statusString = "Reached 0mph, waiting for vehicle motion before clock started...";
+	    							motionWaiting = true;
+	    						}
+	    					}
+	    				}
+	            		onBoardDisplay.trackTestPanel.repaint();
+						try {
+							Thread.sleep(10);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					} else {
 						try {
 							Thread.sleep(1000);
 						} catch (InterruptedException e) {
@@ -172,18 +226,20 @@ public class Graph {
 							e.printStackTrace();
 						}
 					}
-	            	i++;
+	            	//System.out.println(i++);//Stops loop from garbage collecting itself and stopping the run while waiting...
+	            	//System.out.println(running);
+	            	
 	            }
 	        }
 	        
 	        public void start() {
-	            graphLoop = new Thread(this,"graphUpdateLoopThread");
-	            graphLoop.start();
+	            trackTestLoop = new Thread(this,"trackTestUpdateLoopThread");
+	            trackTestLoop.start();
 	        }
 	        
 	        public void stop() {
 	        	try {
-					graphLoop.join();
+					trackTestLoop.join();
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -193,12 +249,12 @@ public class Graph {
 		
 		public void startRun() {
 			running = true;
-			graphUpdateLoop.start();
+			trackTestUpdateLoop.start();
 		}
 		
 		public void stopRun() {
 			running = false;
-			graphUpdateLoop.stop();
+			trackTestUpdateLoop.stop();
 		}
 		
 		@Override
@@ -218,7 +274,7 @@ public class Graph {
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsWidth-100),
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsHeight-100));
             g2d.setFont(new Font("Gill Sans", Font.BOLD , onBoardDisplay.ModifyAspect(60)));
-            g2d.drawString("Graph Changes", onBoardDisplay.ModifyAspectX(55),
+            g2d.drawString("Record " + currentMode + " Time", onBoardDisplay.ModifyAspectX(55),
                     onBoardDisplay.ModifyAspectY(100));
             
             g2d.setFont(new Font("Gill Sans", Font.BOLD ,
@@ -247,16 +303,22 @@ public class Graph {
             g2d.setFont(new Font("Gill Sans", Font.BOLD ,
                     onBoardDisplay.ModifyAspect(20)));
             g2d.drawString(statusString, onBoardDisplay.ModifyAspectX(100), onBoardDisplay.ModifyAspectY(150));
-            graph.draw(g2d, this);
+            g2d.drawString(String.valueOf(currentSpeed/(double)1.6), onBoardDisplay.ModifyAspectX(800), onBoardDisplay.ModifyAspectY(150));
+            g2d.drawString(String.valueOf((currentDistance-startDistance)/(double)1.6), onBoardDisplay.ModifyAspectX(900), onBoardDisplay.ModifyAspectY(150));
+            int xVal = 150;
+            for (double time : times) {
+            	xVal += 20;
+            	g2d.drawString(String.valueOf(time), onBoardDisplay.ModifyAspectX(100), onBoardDisplay.ModifyAspectY(xVal));
+            }
 		}
 		
-		public GraphPanel(int width,int height) {
+		public TrackTestPanel(int width,int height) {
             this.setSize(width,height);
             setUpKeyboardListener();
             addMouseListener(this);
-            graphUpdateLoop = new UpdateLoop();
+            UpdateLoop trackTestUpdateLoop = new UpdateLoop();
             setVisible(true);
-            System.out.println("Graph Panel setup done, waiting for run command.");
+            System.out.println("Track Test Panel setup done, waiting for run command.");
         }
 	}
 

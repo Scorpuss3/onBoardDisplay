@@ -4,7 +4,7 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 
 import onBoardDisplay.GUI.*;
-import onBoardDisplay.GUI.HUDLayouts.Dash;
+import onBoardDisplay.GUI.HUDLayouts.*;
 import onBoardDisplay.carInterfacing.*;
 import onBoardDisplay.dataHandling.*;
 
@@ -23,11 +23,16 @@ public class onBoardDisplay {
 	public static Detail.DetailPanel detailPanel;
 	
 	public static Dash.DashPanel dashPanel;
+	public static TrackTest.TrackTestPanel trackTestPanel;
+	public static LeaderBoard.LeaderBoardPanel leaderBoardPanel;
+	public static Graph.GraphPanel graphPanel;
 	
 	public static CarInterfacing.CarInterface carInterface;
 	public static DataHandler dataHandler;
 	
 	public static String vehicleName = "VOLKSWAGENPOLO6N214";//"Generic"
+	public static String manufacturerName = "Volkswagen";
+	public static String profileName = "John Doe";
 	
 	public static int graphicsWidth = 1280;//Aspect 16:9
 	public static int graphicsHeight = 720;
@@ -111,6 +116,9 @@ public class onBoardDisplay {
 		detailPanel = new Detail.DetailPanel(trueWidth, trueHeight);
 		
 		dashPanel = new Dash.DashPanel(trueWidth,trueHeight);
+		trackTestPanel = new TrackTest.TrackTestPanel(trueWidth,trueHeight);
+		leaderBoardPanel = new LeaderBoard.LeaderBoardPanel(trueWidth,trueHeight);
+		graphPanel = new Graph.GraphPanel(trueWidth,trueHeight);
 		
 		topLayerPanel = new JPanel(new CardLayout());
 		topLayerPanel.add(menuPanel, "menuPanel");
@@ -118,6 +126,9 @@ public class onBoardDisplay {
 		//topLayerPanel.add(hudPanel,"hudPanel");
 		topLayerPanel.add(detailPanel,"detailPanel");
 		topLayerPanel.add(dashPanel,"dashPanel");
+		topLayerPanel.add(trackTestPanel,"trackTestPanel");
+		topLayerPanel.add(leaderBoardPanel,"leaderBoardPanel");
+		topLayerPanel.add(graphPanel,"graphPanel");
 		
 		layout = (CardLayout) (topLayerPanel.getLayout());
 		topLayerPanel.setVisible(true);

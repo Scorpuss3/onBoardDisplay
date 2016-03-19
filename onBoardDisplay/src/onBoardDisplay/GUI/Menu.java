@@ -92,9 +92,8 @@ public class Menu {
                 new Option("Graph Changes") {
                     @Override
                     public void action() {
-                        onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "hudPanel");
-                        onBoardDisplay.hudPanel.layout.show(onBoardDisplay.hudPanel.hudTopLayerPanel,"graphPanel");
-                        onBoardDisplay.hudPanel.graphPanel.startRun();
+                        onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "graphPanel");
+                        onBoardDisplay.graphPanel.startRun();
                         stopSensing();
                     }
                 },
@@ -111,18 +110,16 @@ public class Menu {
                 new Option("0 - 60 & 1/4 Mile") {
                     @Override
                     public void action() {
-                        onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "hudPanel");
-                        onBoardDisplay.hudPanel.layout.show(onBoardDisplay.hudPanel.hudTopLayerPanel,"rawReadSpecificPanel");
-                        onBoardDisplay.hudPanel.rawReadSpecificPanel.startRun();
+                        onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "trackTestPanel");
+                        onBoardDisplay.trackTestPanel.startRun();
                         stopSensing();
                     }
                 },
                 new Option("Leaderboards") {
                     @Override
                     public void action() {
-                        onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "hudPanel");
-                        onBoardDisplay.hudPanel.layout.show(onBoardDisplay.hudPanel.hudTopLayerPanel,"cylinderPanel");
-                        onBoardDisplay.hudPanel.cylinderPanel.startRun();
+                    	onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "leaderBoardPanel");
+                        onBoardDisplay.leaderBoardPanel.startRun();
                         stopSensing();
                     }
                 },
@@ -185,7 +182,6 @@ public class Menu {
         @Override
         public void paint(Graphics g) {
             super.paint(g);
-            System.out.println("Painting....");
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                     RenderingHints.VALUE_ANTIALIAS_ON);
@@ -212,6 +208,7 @@ public class Menu {
                 if (option.selected) {
                     g2d.setColor(Color.PINK);
                     buttonTexture = buttonPressed;
+                    g2d.setColor(Color.RED);
                 } else {
                     g2d.setColor(Color.RED);
                     buttonTexture = button;
@@ -297,9 +294,6 @@ public class Menu {
                 }
             }
             repaint();
-
-            //TODO remove this test script...
-    		onBoardDisplay.carInterface.readPID((byte)0x05, (byte)01, true, 3);
         }
         
         @Override

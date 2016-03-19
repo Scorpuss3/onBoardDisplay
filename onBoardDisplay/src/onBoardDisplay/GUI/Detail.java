@@ -176,6 +176,7 @@ public class Detail {
                 if (option.selected) {
                     g2d.setColor(Color.PINK);
                     buttonTexture = onBoardDisplay.menuPanel.buttonPressed;
+                    g2d.setColor(Color.RED);
                 } else {
                     g2d.setColor(Color.RED);
                     buttonTexture = onBoardDisplay.menuPanel.button;
@@ -325,7 +326,7 @@ public class Detail {
             setUpKeyboardListener();
             addMouseListener(this);
             setVisible(true);
-            System.out.println("Error Code Panel setup done, waiting for run command.");
+            System.out.println("Detail Panel setup done, waiting for run command.");
         }
 	}
 

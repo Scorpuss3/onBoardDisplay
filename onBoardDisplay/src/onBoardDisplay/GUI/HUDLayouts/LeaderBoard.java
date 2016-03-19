@@ -1,4 +1,4 @@
-package onBoardDisplay.GUI;
+package onBoardDisplay.GUI.HUDLayouts;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -10,6 +10,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -19,23 +23,35 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import onBoardDisplay.onBoardDisplay;
+import onBoardDisplay.GUI.Menu;
+import onBoardDisplay.GUI.HUDLayouts.Dash.DashPanel.UpdateLoop;
 import onBoardDisplay.GUI.Menu.MenuPanel.Option;
+import onBoardDisplay.GUI.components.dials.DialSkin1;
 import onBoardDisplay.dataHandling.Code;
 import onBoardDisplay.dataHandling.DataHandler;
+import onBoardDisplay.dataHandling.PID;
 
-public class ErrorCodes {
-	public static class ErrorCodePanel extends JPanel implements MouseListener {
+public class LeaderBoard {
+	public static class LeaderBoardPanel extends JPanel implements MouseListener {
 		private boolean running = false;
-		private ArrayList<Option> shownCodes = new ArrayList<>();
-		private int numOfCodes = 0;
+		private String currentMode = "0-60";
+		private static TreeMap<Double,String> currentLeaderBoard = onBoardDisplay.dataHandler.leaderboard060;
 		private Menu.MenuPanel.Option[] buttons = new Menu.MenuPanel.Option[] {
-			new Menu.MenuPanel.Option("Run Scan",55,onBoardDisplay.graphicsHeight-60-55,400,60,null) {
+			new Menu.MenuPanel.Option("Mode: "+currentMode,55,onBoardDisplay.graphicsHeight-60-55,350,60,null) {
 				@Override
 				public void action() {
-					runScan();
+					if (currentMode == "0-60") {
+						currentMode = "1/4 Mile";
+						this.currentCaption  = "Mode: "+currentMode;
+						currentLeaderBoard = onBoardDisplay.dataHandler.leaderboard014;
+					} else {
+						currentMode = "0-60";
+						this.currentCaption  = "Mode: "+currentMode;
+						currentLeaderBoard = onBoardDisplay.dataHandler.leaderboard060;
+					}
 				}
 			},
-			new Menu.MenuPanel.Option("Exit",55+400+5,onBoardDisplay.graphicsHeight-60-55,400,60,null) {
+			new Menu.MenuPanel.Option("Exit",55+400+5,onBoardDisplay.graphicsHeight-60-55,350,60,null) {
 				@Override
 				public void action() {
 					keyAction("ESCAPE");
@@ -50,16 +66,6 @@ public class ErrorCodes {
             int xPos = (int)((trueXPos - onBoardDisplay.xOffset)/onBoardDisplay.graphicsMultiplier);
             int yPos = (int)((trueYPos - onBoardDisplay.yOffset)/onBoardDisplay.graphicsMultiplier);
             for (Option option : buttons) {
-                if (xPos >= option.xPosition &&
-                        (xPos <= (option.xPosition + option.width) &&
-                        yPos >= option.yPosition &&
-                        yPos <= (option.yPosition + option.height))) {
-                    option.select();
-                } else {
-                    option.deselect();
-                }
-            }for (Option option : shownCodes) {
-                System.out.print(option.currentCaption); System.out.print(option.xPosition); System.out.println(option.yPosition);
                 if (xPos >= option.xPosition &&
                         (xPos <= (option.xPosition + option.width) &&
                         yPos >= option.yPosition &&
@@ -109,53 +115,10 @@ public class ErrorCodes {
                             option.action();
                         }
                     }
-                	for (Option option : shownCodes) {
-                		if (option.selected) {
-                			option.action();
-                		}
-                	}
                 }
                 repaint();
             }
         }
-		
-		public void runScan() {
-			System.out.println("Now running error code scan");
-			short[] errorCodes = onBoardDisplay.carInterface.getErrorCodes();
-			System.out.print("Num of error codes read: "); System.out.println(errorCodes.length);
-			if (errorCodes.length > 0) {
-				shownCodes = new ArrayList<>();
-			}
-			int x = 65;
-			int y = 110;
-			int spacing = 50;
-			numOfCodes = 0;
-			for (short errorCode : errorCodes) {
-				numOfCodes++;
-				Code decoded = onBoardDisplay.dataHandler.decodeErrorCode(onBoardDisplay.vehicleName,errorCode);
-				System.out.println("Found Error Code: " + Short.toString(decoded.ID) + " : " + decoded.Description);
-				String shortDescription;
-				try {
-					shortDescription = decoded.Description.substring(0,30);
-				} catch (java.lang.NullPointerException e) {
-					shortDescription = null;
-				}
-				Option newOption = new Option(decoded.IDString + " : " + shortDescription,
-						x, y,500,40,decoded) {
-					@Override
-					public void action() {
-						System.out.println("Activating Button Action                                               *");
-						running = false;
-						onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "detailPanel");
-						onBoardDisplay.detailPanel.setItem(decoded);
-						onBoardDisplay.detailPanel.startRun();
-					}
-				};
-				shownCodes.add(newOption);
-				y = y + spacing;
-			}
-			//TODO Add scan running stuff here to collect data and prepare for painting.
-		}
 		
 		public void startRun() {
 			running = true;
@@ -182,7 +145,7 @@ public class ErrorCodes {
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsWidth-100),
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsHeight-100));
             g2d.setFont(new Font("Gill Sans", Font.BOLD , onBoardDisplay.ModifyAspect(60)));
-            g2d.drawString("Read Error Codes", onBoardDisplay.ModifyAspectX(55),
+            g2d.drawString("Record " + currentMode + " Time", onBoardDisplay.ModifyAspectX(55),
                     onBoardDisplay.ModifyAspectY(100));
             
             g2d.setFont(new Font("Gill Sans", Font.BOLD ,
@@ -210,36 +173,30 @@ public class ErrorCodes {
             }
             g2d.setFont(new Font("Gill Sans", Font.BOLD ,
                     onBoardDisplay.ModifyAspect(20)));
-            if (numOfCodes > 0) {
-	            for (Option option : shownCodes){
-	                if (option.selected) {
-	                    g2d.setColor(Color.PINK);
-	                    buttonTexture = onBoardDisplay.menuPanel.buttonPressed;
-	                } else {
-	                    g2d.setColor(Color.RED);
-	                    buttonTexture = onBoardDisplay.menuPanel.button;
-	                }
-	                g2d.drawImage(buttonTexture,
-	                        onBoardDisplay.ModifyAspectX(option.xPosition),
-	                        onBoardDisplay.ModifyAspectY(option.yPosition),
-	                        onBoardDisplay.ModifyAspect(option.width),
-	                        onBoardDisplay.ModifyAspect(option.height),
-	                        this);
-	                g2d.drawString(option.currentCaption,
-	                        onBoardDisplay.ModifyAspectX(option.xPosition + 70),
-	                        onBoardDisplay.ModifyAspectY(option.yPosition+option.height-18));
-	                //The adding is needed above because strings are drawn with
-	                //the y co-ordinate as the bottom, not top.
-	            }
-            }
+            Set set = currentLeaderBoard.entrySet();
+    		Iterator it = set.iterator();
+    		int yVal = 150;
+    		boolean first = true;
+    		while (it.hasNext()) {
+    			if (first) {
+    	            g2d.setFont(new Font("Gill Sans", Font.BOLD , onBoardDisplay.ModifyAspect(30)));
+    	            yVal += 30;
+    				first = false;
+    			} else {
+    				g2d.setFont(new Font("Gill Sans", Font.BOLD , onBoardDisplay.ModifyAspect(20)));
+    			}
+    			Map.Entry me = (Map.Entry)it.next();
+    			g2d.drawString(me.getKey()+"    "+me.getValue(), 200, yVal);
+    			yVal += 50;
+    		}
 		}
 		
-		public ErrorCodePanel(int width,int height) {
+		public LeaderBoardPanel(int width,int height) {
             this.setSize(width,height);
             setUpKeyboardListener();
             addMouseListener(this);
             setVisible(true);
-            System.out.println("Error Code Panel setup done, waiting for run command.");
+            System.out.println("Leaderboard Panel setup done, waiting for run command.");
         }
 	}
 

@@ -34,13 +34,14 @@ public class Dash {
 	public static class DashPanel extends JPanel implements MouseListener {
 		private static boolean running = false;
 		private UpdateLoop dashUpdateLoop = new UpdateLoop();
-		private static PID[] pidList = {onBoardDisplay.dataHandler.decodePID((byte)0x0A),
-				onBoardDisplay.dataHandler.decodePID((byte)0x0C),
+		private static PID[] pidList = {onBoardDisplay.dataHandler.decodePID((byte)0x0C),
+				onBoardDisplay.dataHandler.decodePID((byte)0x05),
+				onBoardDisplay.dataHandler.decodePID((byte)0x0B),
 				onBoardDisplay.dataHandler.decodePID((byte)0x0D),
-				onBoardDisplay.dataHandler.decodePID((byte)0x04),};
+				};
 		private static DialSkin1[] dialList = {
 				new DialSkin1(pidList[0],100,150,200,200,pidList[0].min,pidList[0].max,(float)0.8),
-				new DialSkin1(pidList[1],100,400,200,200,pidList[1].min,pidList[1].max,(float)0.8),
+				//new DialSkin1(pidList[1],100,400,200,200,pidList[1].min,pidList[1].max,(float)0.8),
 				new DialSkin1(pidList[2],500,150,200,200,pidList[2].min,pidList[2].max,(float)0.8),
 				new DialSkin1(pidList[3],500,400,200,200,pidList[3].min,pidList[3].max,(float)0.8)
 		};
@@ -129,16 +130,17 @@ public class Dash {
 	            		System.out.println("now refreshing");
 						for (DialSkin1 selectedDial : dialList) {
 							byte[] rawBytes = onBoardDisplay.carInterface.readPID(selectedDial.pid.ID, false);//TODO consider turning autoretry on...
+							System.out.print("Decoded Value:"); System.out.println(onBoardDisplay.dataHandler.decodePIDRead(rawBytes, selectedDial.pid));
 							selectedDial.update(onBoardDisplay.dataHandler.decodePIDRead(rawBytes, selectedDial.pid),selectedDial.pid.unit);
 						}
 						//onBoardDisplay.hudPanel.dashPanel.repaint();
 						onBoardDisplay.dashPanel.repaint();
-						try {
-							Thread.sleep(10);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+						//try {
+						//	Thread.sleep(100);
+						//} catch (InterruptedException e) {
+						//	// TODO Auto-generated catch block
+						//	e.printStackTrace();
+						//}
 					}
 	            	//System.out.println(i++);//Stops loop from garbage collecting itself and stopping the run while waiting...
 	            	//System.out.println(running);
@@ -174,7 +176,6 @@ public class Dash {
 		@Override
         public void paint(Graphics g) {
             super.paint(g);
-            System.out.println("Painting....");
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                     RenderingHints.VALUE_ANTIALIAS_ON);
@@ -217,7 +218,6 @@ public class Dash {
             }
             
             for (DialSkin1 selectedDial : dialList) {
-            	System.out.println("Drawing a dial...");
             	selectedDial.draw(g2d, this);
 			}
 		}

@@ -132,14 +132,11 @@ public class CarInterfacing {
 		}
 		
 		public short[] getErrorCodes() {
-			if (networkMode == 0) {
-				short[] fakeShorts ={(short) 2,(short) 24, (short) 10};
-				return fakeShorts;
-			}
 			//A single error code can be defined in 2 bytes, which is the size of short.
 			//TODO Error Code reading stuff. Uncomment below
 			int numOfErrors = getNumOfErrors();
-			byte[] rawBytes = submitToECU("03",numOfErrors+2);
+			System.out.print("Number of error codes from pid:"); System.out.println(numOfErrors);
+			byte[] rawBytes = submitToECU("03",numOfErrors*2+1);
 			short[] dtcShorts = new short[rawBytes.length/2];
 			int shortCount = 0;
 			boolean toggle = false;
@@ -154,13 +151,16 @@ public class CarInterfacing {
 				toggle = !toggle;
 			}
 			System.out.print("Read some DTCs: ");
-			System.out.print(dtcShorts[0]);
+			System.out.println(dtcShorts[0]);
 			System.out.println(dtcShorts[1]);
-			return dtcShorts;
+			//return dtcShorts;//TODO turn this back on...
+			short[] fakeShorts ={(short) 2,(short) 24, (short) 4905};
+			return fakeShorts;
 		}
 		
 		public byte[] submitToECU(String submitString, int expectedBytes) {
 			//TODO Sensor Reading stuff.
+			int numOfCmdBytes = submitString.split(" ").length; 
 			if (networkMode == 0) {
 				byte[] ba = {(byte)0,(byte)0,(byte)0,(byte)0,(byte)0,(byte)0};// Probably covers everything, false because no connection
 				return ba;
@@ -180,9 +180,10 @@ public class CarInterfacing {
 				//System.out.println("RESPONSE START");
 				//while ((response = ECUout.readLine()) != null) {
 				while ((response = ECUout.readLine()) != ">") {
+					//while (!(response = ECUout.readLine()).equals(">")) {
 					//TODO Handle ECU output...
 					System.out.println("Raw:"+response);
-					System.out.print("Length:"); System.out.println(response.length());
+					//System.out.print("Length:"); System.out.println(response.length());
 					if (response.length() != 0) {
 						if (response.substring(response.length()-1) == "\n") {
 							response = response.substring(0,response.length()-1);//Removes last character (\n I think)
@@ -190,28 +191,26 @@ public class CarInterfacing {
 					
 						System.out.println("Removed newline.");
 						//System.out.println(response == "NO DATA");
-						if (!(response == "STOPPED" || response == "NO DATA" || response.substring(0,0) == ">"|| response == null|| response == "")) {
-						
+						if (!(response.contains("STOPPED") ||response.contains("BUS INIT") || response.equals("NO DATA") || response.substring(0,1).equals(">")|| response == null|| response.equals(""))) {
+							System.out.print("Accepted response as genuine: "); System.out.println(response);
 							String[] asStringArray = response.split(" ");
-							finalBytes = new byte[asStringArray.length-2];
-							for (int i = 2; i < asStringArray.length;i++) {//Starts at 2 to eliminate the first 2 bytes, which are just repeats of the command...
+							finalBytes = new byte[asStringArray.length-numOfCmdBytes];
+							for (int i = numOfCmdBytes; i < asStringArray.length;i++) {//Starts at 2 to eliminate the first 2 bytes, which are just repeats of the command...
 								//System.out.println(asStringArray[i]);
-								System.out.print("Converting string ");
-								System.out.print(asStringArray[i]);
-								System.out.print(" to byte ");
-								finalBytes[i-2] = DataHandler.getByteFromHexString(asStringArray[i]);//i-2 because it was started at 2 for the string array.
-								System.out.println(finalBytes[i-2]);
+								//System.out.print("Converting string ");
+								//System.out.print(asStringArray[i]);
+								//System.out.print(" to byte ");
+								finalBytes[i-numOfCmdBytes] = DataHandler.getByteFromHexString(asStringArray[i]);//i-2 because it was started at 2 for the string array.
+								//System.out.println(finalBytes[i-2]);
 							}
 							System.out.println("(stripped bytes)");
-						} else if (response == "STOPPED") {
+							//return finalBytes; (was returning before setting up next command!
+						} else if (response.contains("STOPPED")) {
 							System.out.println("Rushed ELM");
-						} else if (response == "NO DATA") {
+						} else if (response.contains("STOPPED")) {
+							System.out.println("wait...bus initialising...");
+						} else if (response.equals("NO DATA")) {
 							System.out.println("no data - providing correct number of empty bytes");
-							byte[] ba = new byte[expectedBytes];// Probably covers everything
-							for (int ii = 0; ii <= expectedBytes; ii++) {
-								ba[ii] = (byte)0;
-							}
-							return ba;
 						} else if (response == null || response == "") {
 							System.out.println("null - providing correct number of empty bytes");
 							byte[] ba = new byte[expectedBytes];// Probably covers everything
@@ -223,7 +222,7 @@ public class CarInterfacing {
 							System.out.println("IGNORED POINTLESS OUTPUT");
 						}
 					} else {
-						System.out.println("else 1");
+						//System.out.println("else 1");
 						return finalBytes;
 					}
 				}
@@ -233,11 +232,7 @@ public class CarInterfacing {
 			} catch (RuntimeException e) {
 				System.err.println("Failed get ECU output or could not split into bytes properly.");
 				e.printStackTrace();
-				byte[] ba = new byte[expectedBytes];// Probably covers everything
-				for (int ii = 0; ii <= expectedBytes; ii++) {
-					ba[ii] = (byte)0;
-				}
-				return ba;
+				return new byte[] {0x0};
 			}
 			
 			//FAKE TEMP STUFF BELOW...
@@ -255,19 +250,42 @@ public class CarInterfacing {
 		public byte[] readPID(byte PID, byte mode, boolean autoRetry, int expectedBytes) {
 			/* Returns the raw bytes of the PID asked for, and makes sure that some data is recieved if required.
 			 * Also checks against expected number of bytes.*/
+//			try {
+//				if (!onBoardDisplay.dataHandler.supportedPIDs.get(PID)) {
+//					//byte[] blank = new byte[expectedBytes];
+//					//for (int i = 0; i < expectedBytes; i++) {
+//					//	blank[i] = 0;
+//					//}
+//					System.out.print(PID); System.out.println("PID was not available in this vehicle...");
+//				}
+//			} catch (Exception e){
+//				
+//			}
 			setMode(mode);
-			String submitString = DataHandler.getHexCharacters(obdMode) + " " + DataHandler.getHexCharacters(PID);
+			//String submitString = DataHandler.getHexCharacters(obdMode) + " " + DataHandler.getHexCharacters(PID);
+			String submitString = DataHandler.getHexCharacters(obdMode) + " " + DataHandler.getHexCharacters(PID) + "1";//http://stackoverflow.com/questions/21334147/send-multiple-obd-commands-together-and-get-response-simultaneously?lq=1
+			System.out.print("Reading PID: "); System.out.println(submitString);
 			//Adding a 1 to the end may increase speed according to
 			//http://stackoverflow.com/questions/21334147/send-multiple-obd-commands-together-and-get-response-simultaneously?lq=1
 			byte[] response = submitToECU(submitString, expectedBytes);
-			System.out.println("here first");
+			//System.out.println("here first");
 			int tryCount = 1;
-			int maxTries = 5;
-			if (response.length < 2) {
+			int maxTries = 3;//10;
+			//if (response.length < 2) {
+			System.out.print("ReadPID supplied with:");
+			for (byte bte : response) {
+				System.out.print(bte);
+				System.out.print(" ");
+			}
+			System.out.print("length:"); System.out.print(response.length); System.out.print("Expected:"); System.out.println(expectedBytes);
+			if (response.length != expectedBytes-2) {
 				if (autoRetry) {
-					while (response.length < 2) {
+					//while (response.length < 2) {
+					//while (response.length < expectedBytes) {
+					while ((response = submitToECU(submitString, expectedBytes)).length < expectedBytes) {
+						System.out.println("in loop");
 						if (tryCount == maxTries) {
-							System.err.println("Could not get a meaningful output from ELM. Setting to offline mode...");
+							System.err.println("Ran out of retries. Could not get a meaningful output from ELM for "); System.out.println(submitString);
 							byte[] ba = new byte[expectedBytes-2];// Probably covers everything. -4 because this removes mode and PID bytes
 							for (int ii = 0; ii < expectedBytes-2; ii++) {
 								ba[ii] = (byte)0;
@@ -281,14 +299,14 @@ public class CarInterfacing {
 //							// TODO Auto-generated catch block
 //							e.printStackTrace();
 //						}
-						System.out.println("Retrying read...");
-						response = submitToECU(submitString, expectedBytes);
-						System.out.print("RESPONSE:");
-						for (byte byt : response) {
-							System.out.print(byt);
-						}
-						System.out.println();
-						System.out.println(response.length);
+						//System.out.println("Retrying read...");
+						//response = submitToECU(submitString, expectedBytes);
+						//System.out.print("RESPONSE:");
+						//for (byte byt : response) {
+							//System.out.print(byt);
+						//}
+						//System.out.println();
+						//System.out.println(response.length);
 					}
 				} else {
 					//TODO change this to do something more useful than just be 0. The -2 is so that you remove mode and PID
@@ -299,21 +317,25 @@ public class CarInterfacing {
 					return ba;
 				}
 			}
-			byte[] processed = new byte[response.length-2];
-			int ii = 0;
-			System.out.print("Byte Accepted: ");
+			//byte[] processed = new byte[response.length-2];
+			//int ii = 0;
+			//System.out.print("Byte Accepted. ");
 			//for (byte byt : response) {
-			//	System.out.print(byt);
+				//System.out.print(byt);
 				//if (ii < processed.length) {
 				//	processed[ii] = byt;
 				//	System.out.print(" ");
 				//	System.out.print(byt);
 				//}
-			//	processed[ii] = byt;
-			//	ii++;
+				//processed[ii] = byt;
+				//ii++;
 			//}
 			//Had been double removing the first two bytes!!!
-			System.out.println();
+			System.out.println("Last Rep");
+			for (byte bte : response) {
+				System.out.print(bte);
+				System.out.print(" ");
+			}
 			return response;//processed;
 		}
 		

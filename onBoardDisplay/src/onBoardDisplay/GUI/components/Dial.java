@@ -28,10 +28,10 @@ public class Dial {
 		xMod = (float)realWidth / (float)genericWidth;
 		yMod = (float)realHeight / (float)genericHeight;
 		fontMod = xMod;
-		System.out.print("Create new dial: ");
-		System.out.println(xMod);
-		System.out.println(yMod);
-		System.out.println(fontMod);
+		//System.out.print("Create new dial: ");
+		//System.out.println(xMod);
+		//System.out.println(yMod);
+		//System.out.println(fontMod);
 	}
 	
 	public class Pin {
@@ -54,10 +54,10 @@ public class Dial {
 			float asProportion = reading / (float)(max-min);
 			int angle,angleFromDown,xDirection,yDirection,modX,modY;
 			float circleProportionBelowOrigin = (circleProportion-(float)0.5)/2;
-			System.out.println("1/2 Proportion of Circle used below origin: " + String.valueOf(circleProportionBelowOrigin));
-			System.out.println("Proportion to fill: " + String.valueOf(asProportion));
+			//System.out.println("1/2 Proportion of Circle used below origin: " + String.valueOf(circleProportionBelowOrigin));
+			//System.out.println("Proportion to fill: " + String.valueOf(asProportion));
 			angleFromDown =((int) (asProportion * circleProportion * 360)) + ((int) (90-(circleProportionBelowOrigin*360)));
-			System.out.println("Angle from down: " + String.valueOf(angleFromDown));
+			//System.out.println("Angle from down: " + String.valueOf(angleFromDown));
 			if (asProportion < 0.5) {
 				xDirection = -1;
 			} else {
@@ -79,15 +79,15 @@ public class Dial {
 					angle = angleFromDown - 90;
 				}
 			}
-			System.out.println("Angle in quadrant: " + String.valueOf(angle));
-			System.out.println("XDirection: " + String.valueOf(xDirection));
-			System.out.println("YDirection: " + String.valueOf(yDirection));
+			//System.out.println("Angle in quadrant: " + String.valueOf(angle));
+			//System.out.println("XDirection: " + String.valueOf(xDirection));
+			//System.out.println("YDirection: " + String.valueOf(yDirection));
 			//X needs to always be the adj, Y needs to always be the opp...
 			//hyp is length of line...
 			modX = ((int) (Math.cos(Math.toRadians(angle))*this.relativeLength)) * xDirection;
 			modY = ((int) (Math.sin(Math.toRadians(angle))*this.relativeLength)) * yDirection;
-			System.out.println("modX: " + String.valueOf(modX));
-			System.out.println("modY: " + String.valueOf(modY));
+			//System.out.println("modX: " + String.valueOf(modX));
+			//System.out.println("modY: " + String.valueOf(modY));
 			this.endX = originX + modX;
 			this.endY = originY + modY;
 		}
