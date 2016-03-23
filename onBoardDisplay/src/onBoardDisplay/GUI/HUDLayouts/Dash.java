@@ -24,6 +24,7 @@ import onBoardDisplay.GUI.Detail.DetailPanel.DetailMode;
 import onBoardDisplay.GUI.Detail.DetailPanel.ImageType;
 import onBoardDisplay.GUI.Menu.MenuPanel.Option;
 import onBoardDisplay.GUI.components.Dial;
+import onBoardDisplay.GUI.components.dials.BarWidget;
 import onBoardDisplay.GUI.components.dials.DialSkin1;
 import onBoardDisplay.dataHandling.Code;
 import onBoardDisplay.dataHandling.DataHandler;
@@ -41,11 +42,14 @@ public class Dash {
 				};
 		private static DialSkin1[] dialList = {
 				new DialSkin1(pidList[0],100,150,200,200,pidList[0].min,pidList[0].max,(float)0.8),
-				//new DialSkin1(pidList[1],100,400,200,200,pidList[1].min,pidList[1].max,(float)0.8),
+				new DialSkin1(pidList[1],100,400,200,200,pidList[1].min,pidList[1].max,(float)0.8),
 				new DialSkin1(pidList[2],500,150,200,200,pidList[2].min,pidList[2].max,(float)0.8),
 				new DialSkin1(pidList[3],500,400,200,200,pidList[3].min,pidList[3].max,(float)0.8)
 		};
-		
+		private static BarWidget[] barList = {
+				new BarWidget(pidList[1],900,150,60,400,pidList[1].min,pidList[1].max,false)
+		};
+		//private static BarWidget barWidget = new BarWidget(pidList[1],900,150,30,200,pidList[1].min,pidList[1].max,false);
 		private Menu.MenuPanel.Option[] buttons = new Menu.MenuPanel.Option[] {
 			new Menu.MenuPanel.Option("Exit",55,onBoardDisplay.graphicsHeight-60-55,400,60,null) {
 				@Override
@@ -133,6 +137,12 @@ public class Dash {
 							System.out.print("Decoded Value:"); System.out.println(onBoardDisplay.dataHandler.decodePIDRead(rawBytes, selectedDial.pid));
 							selectedDial.update(onBoardDisplay.dataHandler.decodePIDRead(rawBytes, selectedDial.pid),selectedDial.pid.unit);
 						}
+						
+						for (BarWidget selectedBar : barList) {
+							byte[] rawBytes = onBoardDisplay.carInterface.readPID(selectedBar.pid.ID, false);//TODO consider turning autoretry on...
+							System.out.print("Decoded Value:"); System.out.println(onBoardDisplay.dataHandler.decodePIDRead(rawBytes, selectedBar.pid));
+							selectedBar.update(onBoardDisplay.dataHandler.decodePIDRead(rawBytes, selectedBar.pid),selectedBar.pid.unit);
+						}
 						//onBoardDisplay.hudPanel.dashPanel.repaint();
 						onBoardDisplay.dashPanel.repaint();
 						//try {
@@ -179,12 +189,12 @@ public class Dash {
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                     RenderingHints.VALUE_ANTIALIAS_ON);
-            g2d.setColor(Color.BLACK);
+            g2d.setColor(onBoardDisplay.guiColours[0]);
             g2d.fillRect(0,0,onBoardDisplay.trueWidth,onBoardDisplay.trueHeight);
             g2d.fillRect(onBoardDisplay.ModifyAspectX(0),onBoardDisplay.ModifyAspectY(0),
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsWidth) ,
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsHeight));
-            g2d.setColor(Color.RED);
+            g2d.setColor(onBoardDisplay.guiColours[2]);
             g2d.drawRect(onBoardDisplay.ModifyAspectX(50),
                     onBoardDisplay.ModifyAspectY(50),
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsWidth-100),
@@ -198,10 +208,10 @@ public class Dash {
             Image buttonTexture;
             for (Option option : buttons){
                 if (option.selected) {
-                    g2d.setColor(Color.PINK);
+                	g2d.setColor(onBoardDisplay.guiColours[3]);
                     buttonTexture = onBoardDisplay.menuPanel.buttonPressed;
                 } else {
-                    g2d.setColor(Color.RED);
+                	g2d.setColor(onBoardDisplay.guiColours[2]);
                     buttonTexture = onBoardDisplay.menuPanel.button;
                 }
                 g2d.drawImage(buttonTexture,
@@ -216,10 +226,16 @@ public class Dash {
                 //The adding is needed above because strings are drawn with
                 //the y co-ordinate as the bottom, not top.
             }
+            g2d.setColor(onBoardDisplay.guiColours[2]);
             
             for (DialSkin1 selectedDial : dialList) {
             	selectedDial.draw(g2d, this);
 			}
+            for (BarWidget selectedBar : barList) {
+            	selectedBar.draw(g2d, this);
+			}
+            //barWidget.update(onBoardDisplay.dataHandler.decodePIDRead(new byte[] {0x11}, barWidget.pid),barWidget.pid.unit);
+            //barWidget.draw(g2d, this);
 		}
 		
 		public DashPanel(int width,int height) {

@@ -51,7 +51,7 @@ public class Dial {
 		}
 		
 		public void update(float reading) {
-			float asProportion = reading / (float)(max-min);
+			float asProportion = (reading-min) / (float)(max-min);
 			int angle,angleFromDown,xDirection,yDirection,modX,modY;
 			float circleProportionBelowOrigin = (circleProportion-(float)0.5)/2;
 			//System.out.println("1/2 Proportion of Circle used below origin: " + String.valueOf(circleProportionBelowOrigin));

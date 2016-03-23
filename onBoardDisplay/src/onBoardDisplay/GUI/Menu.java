@@ -10,16 +10,24 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.InputMap;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import onBoardDisplay.*;
+import onBoardDisplay.dataHandling.PID;
 
 public class Menu {
 	public static class MenuPanel extends JPanel implements MouseListener {
@@ -171,6 +179,44 @@ public class Menu {
                     onBoardDisplay.calculateAspect();
                 }
             },
+            new Option("Change Colours") {
+                @Override
+                public void action() {
+                	String[] availableColourStrings = onBoardDisplay.dataHandler.colourNames.keySet().toArray(new String[onBoardDisplay.dataHandler.colourNames.size()]);
+            		JPanel dialogPanel = new JPanel();
+            		dialogPanel.add(new JLabel("Select Colours (default: BLACK, GREEN, RED, PINK):"));
+                    JComboBox[] comboBoxes = new JComboBox[4];
+                    for (int i = 0; i< 4; i++) {
+                    	DefaultComboBoxModel model = new DefaultComboBoxModel();
+                    	for (String colourString: availableColourStrings) {
+                            model.addElement(colourString);
+                        }
+                    	Set set = onBoardDisplay.dataHandler.colourNames.entrySet();
+                		Iterator it = set.iterator();
+                		while (it.hasNext()) {
+                			Map.Entry me = (Map.Entry)it.next();
+                			if ((Color) me.getValue()==onBoardDisplay.guiColours[i]) {
+                                model.setSelectedItem(me.getKey());
+                			}
+                		}
+                    	JComboBox comboBox= new JComboBox(model);
+                        dialogPanel.add(comboBox);
+                        comboBoxes[i] = comboBox;
+                    }
+                    int confirmed = JOptionPane.showConfirmDialog(null, dialogPanel, "PID", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    if (confirmed == JOptionPane.OK_OPTION) {
+                    	System.out.print("Setting new colours:");
+                    	for (int i = 0; i < 4; i++) {
+                    		try {
+                    			onBoardDisplay.guiColours[i] = onBoardDisplay.dataHandler.colourNames.get((String)comboBoxes[i].getSelectedItem());
+                    			System.out.print((String)comboBoxes[i].getSelectedItem()+ " ");
+                    		} catch (Exception e) {
+                    		}
+                    		System.out.println();
+                    	}
+                    }
+                }
+            },
             new Option("Back") {
                 @Override
                 public void action() {
@@ -185,13 +231,12 @@ public class Menu {
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                     RenderingHints.VALUE_ANTIALIAS_ON);
-            g2d.setColor(Color.BLACK);
+            g2d.setColor(onBoardDisplay.guiColours[0]);
             g2d.fillRect(0,0,onBoardDisplay.trueWidth,onBoardDisplay.trueHeight);
-            g2d.setColor(Color.BLACK);
             g2d.fillRect(onBoardDisplay.ModifyAspectX(0),onBoardDisplay.ModifyAspectY(0),
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsWidth) ,
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsHeight));
-            g2d.setColor(Color.RED);
+            g2d.setColor(onBoardDisplay.guiColours[2]);
             g2d.drawRect(onBoardDisplay.ModifyAspectX(100),
                     onBoardDisplay.ModifyAspectY(100),
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsWidth-200),
@@ -206,11 +251,10 @@ public class Menu {
             Image buttonTexture;
             for (Option option : shownOptions){
                 if (option.selected) {
-                    g2d.setColor(Color.PINK);
+                    g2d.setColor(onBoardDisplay.guiColours[3]);
                     buttonTexture = buttonPressed;
-                    g2d.setColor(Color.RED);
                 } else {
-                    g2d.setColor(Color.RED);
+                    g2d.setColor(onBoardDisplay.guiColours[2]);
                     buttonTexture = button;
                 }
                 //option.xPosition =(onBoardDisplay.graphicsWidth/2)-(option.width/2);
@@ -233,6 +277,7 @@ public class Menu {
                 //The adding is needed above because strings are drawn with
                 //the y co-ordinate as the bottom, not top.
             }
+            g2d.setColor(onBoardDisplay.guiColours[2]);
         }
     
         public static class Option{

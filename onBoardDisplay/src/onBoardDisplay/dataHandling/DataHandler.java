@@ -1,6 +1,7 @@
 package onBoardDisplay.dataHandling;
 
 import java.awt.Image;
+import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -24,6 +25,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
+//import com.sun.prism.paint.Color;
 
 import onBoardDisplay.onBoardDisplay;
 
@@ -76,6 +79,22 @@ public class DataHandler {
 		put("POW", new Image[] {powTextureFront, powTextureSide, powTextureTop});
 		put("UNK", new Image[] {unkTextureFront, unkTextureSide, unkTextureTop});
 		put("SAF", new Image[] {safTextureFront, safTextureSide, safTextureTop});
+	}};
+	public static final HashMap<String, Color> colourNames = new HashMap<String,Color>() {{
+		put("BLACK", Color.BLACK);
+		put("BLUE", Color.BLUE);
+		put("CYAN", Color.CYAN);
+		put("DARK GRAY", Color.DARK_GRAY);
+		put("GRAY", Color.GRAY);
+		put("GREEN", Color.GREEN);
+		put("LIGHT GRAY", Color.LIGHT_GRAY);
+		put("MAGENTA", Color.MAGENTA);
+		put("ORANGE", Color.ORANGE);
+		put("PINK", Color.PINK);
+		put("RED", Color.RED);
+		put("WHITE", Color.WHITE);
+		put("YELLOW", Color.YELLOW);
+		
 	}};
 	private Connection codeC, PIDC, locationC;
 	

@@ -207,12 +207,12 @@ public class Graph {
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                     RenderingHints.VALUE_ANTIALIAS_ON);
-            g2d.setColor(Color.BLACK);
+            g2d.setColor(onBoardDisplay.guiColours[0]);
             g2d.fillRect(0,0,onBoardDisplay.trueWidth,onBoardDisplay.trueHeight);
             g2d.fillRect(onBoardDisplay.ModifyAspectX(0),onBoardDisplay.ModifyAspectY(0),
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsWidth) ,
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsHeight));
-            g2d.setColor(Color.RED);
+            g2d.setColor(onBoardDisplay.guiColours[2]);
             g2d.drawRect(onBoardDisplay.ModifyAspectX(50),
                     onBoardDisplay.ModifyAspectY(50),
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsWidth-100),
@@ -226,10 +226,10 @@ public class Graph {
             Image buttonTexture;
             for (Option option : buttons){
                 if (option.selected) {
-                    g2d.setColor(Color.PINK);
+                    g2d.setColor(onBoardDisplay.guiColours[3]);
                     buttonTexture = onBoardDisplay.menuPanel.buttonPressed;
                 } else {
-                    g2d.setColor(Color.RED);
+                    g2d.setColor(onBoardDisplay.guiColours[2]);
                     buttonTexture = onBoardDisplay.menuPanel.button;
                 }
                 g2d.drawImage(buttonTexture,
@@ -244,6 +244,7 @@ public class Graph {
                 //The adding is needed above because strings are drawn with
                 //the y co-ordinate as the bottom, not top.
             }
+            g2d.setColor(onBoardDisplay.guiColours[2]);
             g2d.setFont(new Font("Gill Sans", Font.BOLD ,
                     onBoardDisplay.ModifyAspect(20)));
             g2d.drawString(statusString, onBoardDisplay.ModifyAspectX(100), onBoardDisplay.ModifyAspectY(150));

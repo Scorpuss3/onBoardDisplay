@@ -15,12 +15,12 @@ import onBoardDisplay.dataHandling.PID;
 public class DialSkin1 extends Dial{
 	public DialSkin1(PID pid, int startX, int startY, int realWidth, int realHeight, int min, int max, float circleProportion) {
 		super(pid, startX, startY, 400, 400, realWidth, realHeight);
-		Text t1 = new Text(pid.Description,20,"Gill Sans",Color.GREEN,150,100);
-		Text t2 = new Text("NODATA",15,"Gill Sans",Color.GREEN,140,370);
+		Text t1 = new Text(pid.Description,20,"Gill Sans",onBoardDisplay.guiColours[1],150,100);
+		Text t2 = new Text("NODATA",15,"Gill Sans",onBoardDisplay.guiColours[1],140,370);
 		Text[] tArray = {t1,t2};
 		this.texts = tArray;
 		
-		Pin pin = new Pin(Color.red,200,200,200,min,max,5,(float)circleProportion);
+		Pin pin = new Pin(onBoardDisplay.guiColours[2],200,200,200,min,max,5,(float)circleProportion);
 		Pin[] pArray = {pin};
 		this.pins = pArray;
 		
