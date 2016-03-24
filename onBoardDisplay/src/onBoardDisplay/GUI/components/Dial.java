@@ -1,6 +1,7 @@
 package onBoardDisplay.GUI.components;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -94,7 +95,7 @@ public class Dial {
 	}
 	
 	public class ImagePart {
-		public Image image;
+		public BufferedImage image;
 		public int relativeX;
 		public int relativeY;
 		public int relativeWidth;
@@ -127,9 +128,10 @@ public class Dial {
 		}
 	}
 	
-	protected Image loadDialSkin(String skinName) {
+	protected BufferedImage loadDialSkin(String skinName) {
 		String full = "/onBoardDisplay/Res/GUIComponentTextures/" + skinName;
-		Image img = new BufferedImage(1,1,1);
+		//Image img = new BufferedImage(1,1,1);
+		BufferedImage img = new BufferedImage(1,1,1);
 		try {
 			img = ImageIO.read(getClass().getResourceAsStream(full));
 		} catch (IOException e) {

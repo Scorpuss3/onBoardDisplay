@@ -34,8 +34,8 @@ public class onBoardDisplay {
 	public static String vehicleName = "VOLKSWAGENPOLO6N214";//"Generic"
 	public static String manufacturerName = "Volkswagen";
 	public static String profileName = "John Doe";
-	public static Color[] guiColours  = {Color.white, Color.black, Color.blue, Color.cyan};
-	//public static Color[] guiColours  = {Color.black, Color.green, Color.red, Color.pink};
+	//public static Color[] guiColours  = {Color.white, Color.black, Color.blue, Color.cyan};
+	public static Color[] guiColours  = {Color.black, Color.green, Color.red, Color.pink};
 	//g2d.setColor(onBoardDisplay.guiColours[0]);
 	
 	public static int graphicsWidth = 1280;//Aspect 16:9
