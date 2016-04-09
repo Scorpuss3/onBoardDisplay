@@ -1,6 +1,7 @@
 package onBoardDisplay.dataHandling;
 
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
@@ -100,6 +101,7 @@ public class DataHandler {
 	
 	public DataHandler() {
 		//TODO Add test to see if using resource pack, then react accordingly.
+		loadOptions();
 		loadCarResources("generic");
 		loadDatabaseConnection();
 		loadLeaderBoards();
@@ -314,6 +316,27 @@ public class DataHandler {
 		}
 	}
 	
+	public BufferedImage tintBufferedImage(String location, Color tintColour) {
+		//Image img = new BufferedImage(1,1,1);
+		BufferedImage img = new BufferedImage(1,1,1);
+		try {
+			img = ImageIO.read(getClass().getResourceAsStream(location));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		for (int x = 0; x <img.getWidth(); x++) {
+			for (int y = 0; y< img.getHeight(); y++) {
+				Color oldColor = new Color(img.getRGB(x,y),true);
+				Color newRGBColor = tintColour;
+				int finalColorAsInt = (oldColor.getAlpha() << 24) | (newRGBColor.getRed() << 16) | (newRGBColor.getGreen() << 8) | newRGBColor.getBlue();
+				//img.setRGB(x, y, new Color(newRGBColor.getRed(),newRGBColor.getGreen(),newRGBColor.getBlue(),oldColor.getAlpha()).getRGB());
+				img.setRGB(x, y, finalColorAsInt);
+			}
+		}
+		return img;
+	}
+	
 	public void loadDatabaseConnection () {
 		//http://wiki.ci.uchicago.edu/VDS/VDSDevelopment/UsingSQLite
 		try {
@@ -476,6 +499,107 @@ public class DataHandler {
 			lastResult = (double)me.getKey();
 		}
 		return lastResult;
+	}
+	
+	public String getGUIColourName(Color color) {
+		Set set = onBoardDisplay.dataHandler.colourNames.entrySet();
+		Iterator it = set.iterator();
+		while (it.hasNext()) {
+			Map.Entry me = (Map.Entry)it.next();
+			if ((Color) me.getValue()==color) {
+                return (String)me.getKey();
+			}
+		}
+		return null;
+	}
+	
+	public void saveOptions() {
+		//TODO Add loading and saving of options
+		File oldFile = new File("onBoardDisplayConfig");
+		oldFile.renameTo(new File("onBoardDisplayConfig.old"));
+		oldFile = new File("onBoardDisplayConfig.old");
+		OutputStream outputStream;
+		try {
+			outputStream = new FileOutputStream("onBoardDisplayConfig");
+			//GUI Colours
+			for (int i= 0; i < onBoardDisplay.guiColours.length; i++) {
+				outputStream.write((getGUIColourName(onBoardDisplay.guiColours[i])).getBytes("UTF-8"));
+				outputStream.write('\n');
+			}
+			outputStream.write(onBoardDisplay.vehicleName.getBytes("UTF-8"));
+			outputStream.write('\n');
+			outputStream.write(onBoardDisplay.manufacturerName.getBytes("UTF-8"));
+			outputStream.write('\n');
+			outputStream.write(onBoardDisplay.profileName.getBytes("UTF-8"));
+			outputStream.write('\n');
+			//TODO add other options to save...
+			
+			oldFile.delete();
+			outputStream.close();
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void loadOptions() {
+		//TODO Add loading and saving of options
+		System.out.println("Reading Config Options");
+		try {
+			InputStream inputStream = new FileInputStream("onBoardDisplayConfig");
+			
+			//TODO modify below this point:
+			int streamSize = inputStream.available();
+			char[] chars014 = new char[streamSize];
+			String currentLine = "";
+			int lineNum = 0;
+			for (int i = 0; i < streamSize; i++) {
+				char character = (char)inputStream.read();
+				if (character == '\n'){
+					switch (lineNum) {
+					case 0:
+						onBoardDisplay.guiColours[0] = colourNames.get(currentLine);
+						break;
+					case 1:
+						onBoardDisplay.guiColours[1] = colourNames.get(currentLine);
+						break;
+					case 2:
+						onBoardDisplay.guiColours[2] = colourNames.get(currentLine);
+						break;
+					case 3:
+						onBoardDisplay.guiColours[3] = colourNames.get(currentLine);
+						break;
+					case 4:
+						onBoardDisplay.vehicleName  = currentLine;
+						break;
+					case 5:
+						onBoardDisplay.manufacturerName  = currentLine;
+						break;
+					case 6:
+						onBoardDisplay.profileName  = currentLine;
+						break;
+					default:
+						break;
+					}
+					lineNum++;
+					currentLine = "";
+				} else {
+					if (character != '\r'){
+						currentLine += character;
+					}
+				}
+			}
+			inputStream.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public Code decodeErrorCode (String vehicleName, short id) {

@@ -8,6 +8,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import onBoardDisplay.onBoardDisplay;
 import onBoardDisplay.dataHandling.PID;
 
 public class Dial {	
@@ -130,14 +131,6 @@ public class Dial {
 	
 	protected BufferedImage loadDialSkin(String skinName) {
 		String full = "/onBoardDisplay/Res/GUIComponentTextures/" + skinName;
-		//Image img = new BufferedImage(1,1,1);
-		BufferedImage img = new BufferedImage(1,1,1);
-		try {
-			img = ImageIO.read(getClass().getResourceAsStream(full));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return img;
+		return onBoardDisplay.dataHandler.tintBufferedImage(full, onBoardDisplay.guiColours[1]);
 	}
 }

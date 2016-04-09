@@ -203,6 +203,7 @@ public class Menu {
                         dialogPanel.add(comboBox);
                         comboBoxes[i] = comboBox;
                     }
+                    dialogPanel.add(new JLabel("(Change Requires Restart)"));
                     int confirmed = JOptionPane.showConfirmDialog(null, dialogPanel, "PID", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
                     if (confirmed == JOptionPane.OK_OPTION) {
                     	System.out.print("Setting new colours:");
@@ -214,6 +215,8 @@ public class Menu {
                     		}
                     		System.out.println();
                     	}
+                    	onBoardDisplay.dataHandler.saveOptions();
+                    	onBoardDisplay.restart();
                     }
                 }
             },
@@ -435,8 +438,8 @@ public class Menu {
             setUpKeyboardListener();
             addMouseListener(this);
             try {
-                button = ImageIO.read(getClass().getResourceAsStream("/onBoardDisplay/Res/Button.png"));
-                buttonPressed = ImageIO.read(getClass().getResourceAsStream("/onBoardDisplay/Res/ButtonSelected.png"));
+            	button = onBoardDisplay.dataHandler.tintBufferedImage("/onBoardDisplay/Res/Button.png", onBoardDisplay.guiColours[1]);
+            	buttonPressed = onBoardDisplay.dataHandler.tintBufferedImage("/onBoardDisplay/Res/ButtonSelected.png", onBoardDisplay.guiColours[1]);
             }catch(Exception e){
                 System.err.println(e);
                 System.err.println("...So could not load button textures.");

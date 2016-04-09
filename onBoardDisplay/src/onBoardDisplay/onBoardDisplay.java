@@ -2,6 +2,10 @@ package onBoardDisplay;
 
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 import onBoardDisplay.GUI.*;
 import onBoardDisplay.GUI.HUDLayouts.*;
@@ -31,9 +35,9 @@ public class onBoardDisplay {
 	public static CarInterfacing.CarInterface carInterface;
 	public static DataHandler dataHandler;
 	
-	public static String vehicleName = "VOLKSWAGENPOLO6N214";//"Generic"
-	public static String manufacturerName = "Volkswagen";
-	public static String profileName = "John Doe";
+	public static String vehicleName;// = "VOLKSWAGENPOLO6N214";//"Generic"
+	public static String manufacturerName;// = "Volkswagen";
+	public static String profileName;// = "John Doe";
 	//public static Color[] guiColours  = {Color.white, Color.black, Color.blue, Color.cyan};
 	public static Color[] guiColours  = {Color.black, Color.green, Color.red, Color.pink};
 	//g2d.setColor(onBoardDisplay.guiColours[0]);
@@ -46,6 +50,28 @@ public class onBoardDisplay {
 	public static int xOffset;
 	public static int yOffset;
 	
+	public static void restart() {
+		final String javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+		File currentJar = null;
+		try {
+			currentJar = new File(dataHandler.getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
+		} catch (URISyntaxException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		final ArrayList<String> command = new ArrayList<String>();
+		command.add(javaBin);
+		command.add("-jar");
+		command.add(currentJar.getPath());
+		final ProcessBuilder builder = new ProcessBuilder(command);
+		try {
+			builder.start();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.exit(0);
+	}
 	public static void calculateAspect() {
 		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 		trueWidth = gd.getDisplayMode().getWidth();
@@ -104,9 +130,19 @@ public class onBoardDisplay {
     	shutdown(0);
     }
 
-	public static void main(String[] args) {
+	public static void main(String[] args) {		
 		topLayerFrame = new JFrame();
 		calculateAspect();
+		
+		JFrame splashFrame = new JFrame();
+		SplashPanel splashPanel = new SplashPanel();
+		splashPanel.setVisible(true);
+		splashFrame.add(splashPanel);
+		splashFrame.setSize(splashPanel.image.getWidth(),splashPanel.image.getHeight());
+		splashFrame.setUndecorated(true);
+		splashFrame.setLocationRelativeTo(null);
+		splashFrame.setVisible(true);
+		splashPanel.repaint();
 		
 		System.out.println(Code.getDatabaseID((short)4639));
 		System.out.println(Code.getStringFromID((short)4639));
@@ -142,6 +178,8 @@ public class onBoardDisplay {
 		topLayerFrame.setSize(trueWidth,trueHeight);
 		topLayerFrame.setUndecorated(true);
 		topLayerFrame.setVisible(true);
+		
+		splashFrame.dispose();
 		
 		menuPanel.startSensing();
 		System.out.println("Testing PID Decode...");
