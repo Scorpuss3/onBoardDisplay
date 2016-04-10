@@ -28,6 +28,7 @@ public class onBoardDisplay {
 	public static Detail.DetailPanel detailPanel;
 	
 	public static Dash.DashPanel dashPanel;
+	public static DashCustomisation.DashCustomisationPanel dashCustomisationPanel;
 	public static TrackTest.TrackTestPanel trackTestPanel;
 	public static LeaderBoard.LeaderBoardPanel leaderBoardPanel;
 	public static Graph.GraphPanel graphPanel;
@@ -156,6 +157,7 @@ public class onBoardDisplay {
 		detailPanel = new Detail.DetailPanel(trueWidth, trueHeight);
 		
 		dashPanel = new Dash.DashPanel(trueWidth,trueHeight);
+		dashCustomisationPanel = new DashCustomisation.DashCustomisationPanel(trueWidth, trueHeight);
 		trackTestPanel = new TrackTest.TrackTestPanel(trueWidth,trueHeight);
 		leaderBoardPanel = new LeaderBoard.LeaderBoardPanel(trueWidth,trueHeight);
 		graphPanel = new Graph.GraphPanel(trueWidth,trueHeight);
@@ -166,6 +168,7 @@ public class onBoardDisplay {
 		//topLayerPanel.add(hudPanel,"hudPanel");
 		topLayerPanel.add(detailPanel,"detailPanel");
 		topLayerPanel.add(dashPanel,"dashPanel");
+		topLayerPanel.add(dashCustomisationPanel,"dashCustomisationPanel");
 		topLayerPanel.add(trackTestPanel,"trackTestPanel");
 		topLayerPanel.add(leaderBoardPanel,"leaderBoardPanel");
 		topLayerPanel.add(graphPanel,"graphPanel");

@@ -282,6 +282,14 @@ public class DataHandler {
         return selected;
 	}
 	
+	public void saveDashArrangements() {
+		//TODO add dash arrangement saving and loading...
+	}
+	
+	public void loadDashArrangements() {
+		//TODO add dash arrangement saving and loading...
+	}
+	
 	public void loadCarResources(String resourceName) {
 		if (resourceName == "generic") {
 			try {
