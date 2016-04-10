@@ -64,7 +64,7 @@ public class Graph {
 				@Override
 				public void action() {
 					//TODO Add graphing PID selection
-					PID[] selected = onBoardDisplay.dataHandler.selectSupportedPIDsDialog(4);
+					PID[] selected = onBoardDisplay.dataHandler.selectSupportedPIDsDialog(4,true);
 					try {
 						if (selected[1]!=null) {
 							pidList = selected;

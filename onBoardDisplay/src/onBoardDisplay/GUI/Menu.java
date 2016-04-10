@@ -220,6 +220,16 @@ public class Menu {
                     }
                 }
             },
+            new Option("Edit Profile Name") {
+                @Override
+                public void action() {
+                	String newName = JOptionPane.showInputDialog(null,"Enter new name:");
+                    if (newName != null) {
+                        onBoardDisplay.profileName = newName;
+                        onBoardDisplay.dataHandler.saveOptions();
+                    }
+                }
+            },
             new Option("Back") {
                 @Override
                 public void action() {

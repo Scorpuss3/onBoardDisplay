@@ -17,8 +17,14 @@ import onBoardDisplay.dataHandling.PID;
 public class DialSkin1 extends Dial{
 	public DialSkin1(PID pid, int startX, int startY, int realWidth, int realHeight, int min, int max, float circleProportion) {
 		super(pid, startX, startY, 400, 400, realWidth, realHeight);
-		Text t1 = new Text(pid.Description,20,"Gill Sans",onBoardDisplay.guiColours[1],150,100);
-		Text t2 = new Text("NODATA",15,"Gill Sans",onBoardDisplay.guiColours[1],140,370);
+		String t1String;
+		if (pid.Description.length() >=realWidth/8) {
+			t1String = pid.Description.substring(0,(realWidth/8)-3) + "...";
+		} else {
+			t1String = pid.Description;
+		}
+		Text t1 = new Text(t1String,18,"Gill Sans",onBoardDisplay.guiColours[1],5,370);
+		Text t2 = new Text("NODATA",16,"Gill Sans",onBoardDisplay.guiColours[1],140,100);
 		Text[] tArray = {t1,t2};
 		this.texts = tArray;
 		

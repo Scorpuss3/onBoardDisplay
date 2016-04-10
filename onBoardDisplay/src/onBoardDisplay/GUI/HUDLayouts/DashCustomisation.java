@@ -1,6 +1,5 @@
 package onBoardDisplay.GUI.HUDLayouts;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -12,36 +11,25 @@ import java.awt.event.MouseListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.InputMap;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import onBoardDisplay.onBoardDisplay;
-import onBoardDisplay.GUI.HUD;
 import onBoardDisplay.GUI.Menu;
-import onBoardDisplay.GUI.Detail.DetailPanel.DetailMode;
-import onBoardDisplay.GUI.Detail.DetailPanel.ImageType;
 import onBoardDisplay.GUI.HUDLayouts.Dash.DashPanel.DashArrangement;
 import onBoardDisplay.GUI.Menu.MenuPanel.Option;
-import onBoardDisplay.GUI.components.Dial;
 import onBoardDisplay.GUI.components.dials.BarWidget;
 import onBoardDisplay.GUI.components.dials.DialSkin1;
 import onBoardDisplay.GUI.components.dials.GraphWidget;
-import onBoardDisplay.dataHandling.Code;
-import onBoardDisplay.dataHandling.DataHandler;
 import onBoardDisplay.dataHandling.PID;
-import onBoardDisplay.dataHandling.DataHandler.Location;
 
 public class DashCustomisation {
 	public static class DashCustomisationPanel extends JPanel implements MouseListener {
 		public static boolean running = false;
-		private DialSkin1[] dialList = new DialSkin1[] {};
-		private BarWidget[] barList = new BarWidget[] {};
+		DialSkin1[] dialList = new DialSkin1[] {};
+		BarWidget[] barList = new BarWidget[] {};
 		private PID newPid;
 		private String helpMessage = "";
 		private boolean addingDial = false;
@@ -51,35 +39,37 @@ public class DashCustomisation {
 		private boolean bufferIsHorizontal = false;
 		private int addingStage = 0;//1 = Starts coordinates, 2=width and height, 3=orientation (bar only)
 		private Menu.MenuPanel.Option[] buttons = new Menu.MenuPanel.Option[] {
-			new Menu.MenuPanel.Option("Add Dial",55,onBoardDisplay.graphicsHeight-60-55,400,60,null) {
+			new Menu.MenuPanel.Option("Add Dial",55,onBoardDisplay.graphicsHeight-60-55,250,60,null) {
 				@Override
 				public void action() {
 					try {
-						newPid = onBoardDisplay.dataHandler.selectSupportedPIDsDialog(1)[0];
+						helpMessage = "Adding new Dial...";
+						newPid = onBoardDisplay.dataHandler.selectSupportedPIDsDialog(1,false)[0];
+		        		helpMessage = "Click for the top left corner";
 						bufferMin = newPid.min;
 						bufferMax = newPid.max;
-						helpMessage = "Adding new Bar...";
 						addingDial = true;
 						addingStage = 1;
 					} catch (Exception e) {
 					}
 				}
 			},
-			new Menu.MenuPanel.Option("Add Bar",55+400+5,onBoardDisplay.graphicsHeight-60-55,350,60,null) {
+			new Menu.MenuPanel.Option("Add Bar",55+250+5,onBoardDisplay.graphicsHeight-60-55,250,60,null) {
 				@Override
 				public void action() {
 					try{
-						newPid = onBoardDisplay.dataHandler.selectSupportedPIDsDialog(1)[0];
+						helpMessage = "Adding new Bar...";
+						newPid = onBoardDisplay.dataHandler.selectSupportedPIDsDialog(1,false)[0];
+		        		helpMessage = "Click for the top left corner";
 						bufferMin = newPid.min;
 						bufferMax = newPid.max;
-						helpMessage = "Adding new Bar...";
 						addingBar = true;
 						addingStage = 1;
 					} catch (Exception e) {
 					}
 				}
 			},
-			new Menu.MenuPanel.Option("Save",55+800+10,onBoardDisplay.graphicsHeight-60-55,300,60,null) {
+			new Menu.MenuPanel.Option("Save",55+500+10,onBoardDisplay.graphicsHeight-60-55,250,60,null) {
 				@Override
 				public void action() {
 					DashArrangement newArrangement = new DashArrangement(onBoardDisplay.dashPanel.currentArrangement.name, true,
@@ -93,7 +83,7 @@ public class DashCustomisation {
 					keyAction("ESCAPE");
 				}
 			},
-			new Menu.MenuPanel.Option("Exit",55+1200+15,onBoardDisplay.graphicsHeight-60-55,300,60,null) {
+			new Menu.MenuPanel.Option("Exit",55+750+15,onBoardDisplay.graphicsHeight-60-55,250,60,null) {
 				@Override
 				public void action() {
 					keyAction("ESCAPE");
@@ -123,7 +113,6 @@ public class DashCustomisation {
             switch (addingStage) {
             case 0:
             	addingStage--;
-        		helpMessage = "Click for the top eft corner";
             	break;
             case 1:
             	bufferX = xPos;
@@ -132,7 +121,7 @@ public class DashCustomisation {
             	break;
             case 2:
             	bufferWidth = xPos - bufferX;
-            	bufferHeight = xPos - bufferY;;
+            	bufferHeight = yPos - bufferY;;
             	if (addingBar) {
             		helpMessage = "Left Click for Vertical, Right click for Horizontal";
             	} else {
@@ -161,7 +150,8 @@ public class DashCustomisation {
 					newDialList[i] = dialList[i];
 				}
 				newDialList[dialList.length] = new DialSkin1(newPid,bufferX,bufferY,bufferWidth,
-						bufferHeight,newPid.min,newPid.max,bufferCircleProportion);
+						bufferHeight,bufferMin,bufferMax,bufferCircleProportion);
+				dialList = newDialList;
 			} else {
 				BarWidget[] newBarList = new BarWidget[barList.length+1];
 				for (int i = 0; i < barList.length; i++) {
@@ -169,7 +159,11 @@ public class DashCustomisation {
 				}
 				newBarList[barList.length] = new BarWidget(newPid,bufferX,bufferY,bufferWidth,
 						bufferHeight,newPid.min,newPid.max,bufferIsHorizontal);
+				barList = newBarList;
 			}
+    		helpMessage = "Item Added";
+    		addingDial = false; addingBar = false;
+    		addingStage = 0;
 		}
 		
 		@Override
@@ -227,7 +221,6 @@ public class DashCustomisation {
 		@Override
         public void paint(Graphics g) {
             super.paint(g);
-            System.out.println("Painting custo...");
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                     RenderingHints.VALUE_ANTIALIAS_ON);
@@ -276,6 +269,7 @@ public class DashCustomisation {
             for (BarWidget selectedBar : barList) {
             	selectedBar.draw(g2d, this);
 			}
+            g2d.drawString(helpMessage, onBoardDisplay.ModifyAspectX(100), onBoardDisplay.ModifyAspectY(150));
             //barWidget.update(onBoardDisplay.dataHandler.decodePIDRead(new byte[] {0x11}, barWidget.pid),barWidget.pid.unit);
             //barWidget.draw(g2d, this);
 		}

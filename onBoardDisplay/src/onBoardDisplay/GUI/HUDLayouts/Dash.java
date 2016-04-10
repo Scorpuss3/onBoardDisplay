@@ -63,6 +63,7 @@ public class Dash {
 			        	String selectedName = (String) comboBox.getSelectedItem();
 			        	for (int i = 0; i < arrangements.length; i++) {
 				            if (arrangements[i].name == selectedName) {
+				            	System.out.print("Set Dash Arrangement to" + arrangements[i].name + " "); System.out.println(arrangements[i].customisable);
 				            	currentArrangement = arrangements[i];
 				            	currentArrangementID = i;
 				            }
@@ -80,12 +81,17 @@ public class Dash {
 				@Override
 				public void action() {
 					if (currentArrangement.customisable) {
-                        stopRun();
+						System.out.println("Starting Layout Edit.");
+						onBoardDisplay.dashCustomisationPanel.dialList = currentArrangement.dialList;
+						onBoardDisplay.dashCustomisationPanel.barList = currentArrangement.barList;
+                        running = false;
 	                    onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "dashCustomisationPanel");
                     	onBoardDisplay.dashCustomisationPanel.startRun();
+					} else {
+						System.out.println("Tried to edit non-customisable dash arrangement.");
 					}
 				}
-			},
+			}
 		};
 		int currentArrangementID = 0;
 		DashArrangement[] arrangements = new DashArrangement[] {
@@ -203,7 +209,7 @@ public class Dash {
 	        	int i = 0;
 	            while (true)  {//TODO change this so that it can be deactivated at program close later.
 	            	if (running) {
-	            		System.out.println("now refreshing");
+	            		//System.out.println("now refreshing");
 						for (DialSkin1 selectedDial : currentArrangement.dialList) {
 							byte[] rawBytes = onBoardDisplay.carInterface.readPID(selectedDial.pid.ID, false);//TODO consider turning autoretry on...
 							System.out.print("Decoded Value:"); System.out.println(onBoardDisplay.dataHandler.decodePIDRead(rawBytes, selectedDial.pid));

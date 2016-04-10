@@ -254,14 +254,30 @@ public class DataHandler {
 		return pids;
 	}
 	
-	public PID[] selectSupportedPIDsDialog(int numberToChoose) {
+	public PID[] getAllPids() {
+		PID[] allPIDs = new PID[101];
+		for (int i = 0; i <=100; i++) {
+			System.out.print("Getting "); System.out.println((byte)i);
+			allPIDs[i] = decodePID((byte)i);
+		}
+		return allPIDs;
+	}
+	
+	public PID[] selectSupportedPIDsDialog(int numberToChoose, boolean onlyUseAvailable) {
 		PID[] selected  = new PID[numberToChoose];
 		JPanel dialogPanel = new JPanel();
 		dialogPanel.add(new JLabel("Select " + Integer.toString(numberToChoose)+" PIDs:"));
-		PID[] onlySupportedPIDs = getAvailablePids();
+		PID[] selectionUsed;
+		if (onlyUseAvailable) {
+			selectionUsed = getAvailablePids();
+		} else {
+			selectionUsed = getAllPids();
+		}
+		
 		DefaultComboBoxModel model = new DefaultComboBoxModel();
-        for (PID pid: onlySupportedPIDs) {
-            model.addElement(pid.ID);
+        for (PID pid: selectionUsed) {
+            //model.addElement(pid.ID);
+        	model.addElement(pid.Description);
         }
         JComboBox[] comboBoxes = new JComboBox[numberToChoose];
         for (int i = 0; i< numberToChoose; i++) {
@@ -273,7 +289,15 @@ public class DataHandler {
         if (confirmed == JOptionPane.OK_OPTION) {
         	for (int i = 0; i < numberToChoose; i++) {
         		try {
-        			selected[0] = onBoardDisplay.dataHandler.decodePID((byte)comboBoxes[i].getSelectedItem());
+        			//selected[0] = onBoardDisplay.dataHandler.decodePID((byte)comboBoxes[i].getSelectedItem());
+        			System.out.print("Description was: "); System.out.println((String)comboBoxes[i].getSelectedItem());
+        			for (PID pid: selectionUsed) {
+        	            //model.addElement(pid.ID);
+        				if (pid.Description.equals((String)comboBoxes[i].getSelectedItem())) {
+        					System.out.print("Matched...");System.out.println(pid.Description);
+        					selected[i] = pid;
+        				}
+        	        }
         		} catch (Exception e) {
         			selected[0] = new PID();
         		}
@@ -665,11 +689,13 @@ public class DataHandler {
 				//TODO Missed out status colours
 				newPID.isBitEncoded = rs.getInt(9)==1;
 				String[] rawParameters = new String[4];
-				rawParameters[0] = rs.getString(10);
-				rawParameters[1] = rs.getString(11);
-				rawParameters[2] = rs.getString(12);
-				rawParameters[3] = rs.getString(13);
-				newPID.conversionParameters = convertMessyNumbers(rawParameters);
+				if (!newPID.isBitEncoded) {
+					rawParameters[0] = rs.getString(10);
+					rawParameters[1] = rs.getString(11);
+					rawParameters[2] = rs.getString(12);
+					rawParameters[3] = rs.getString(13);
+					newPID.conversionParameters = convertMessyNumbers(rawParameters);
+				}
 				newPID.minorLocation = "";//TODO add these to database and read from it
 				newPID.majorLocation = "";
 			}
