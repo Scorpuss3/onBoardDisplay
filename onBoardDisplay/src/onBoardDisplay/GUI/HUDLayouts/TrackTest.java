@@ -148,7 +148,7 @@ public class TrackTest {
 	            	if (scanning) {
 	            		PID pid = onBoardDisplay.dataHandler.decodePID((byte)0x0D);
 	            		currentSpeed = onBoardDisplay.dataHandler.decodePIDRead(onBoardDisplay.carInterface.readPID(pid.ID,false),pid);
-    					PID pid2 = onBoardDisplay.dataHandler.decodePID((byte)0x21);
+    					PID pid2 = onBoardDisplay.dataHandler.decodePID((byte)0x31);
 	            		currentDistance = onBoardDisplay.dataHandler.decodePIDRead(onBoardDisplay.carInterface.readPID(pid2.ID,false),pid2);
 	            		repaint();
 	    				if (currentMode == "0-60") {
@@ -177,8 +177,7 @@ public class TrackTest {
 	    						}
 	    					}
 	    				} else {
-	    					//TODO add 1/4 mile stuff.
-	    					if (recording) {//waiting for reaching 60
+	    					if (recording) {//waiting for reaching 1/4 mile
 	    						float tripDistance = currentDistance - startDistance;
 	    						if (tripDistance >= 0.4) {
 	    							long endTime = System.currentTimeMillis();
@@ -198,8 +197,8 @@ public class TrackTest {
 	    					} else {
 	    						if (motionWaiting && currentSpeed > 0) {
 	    							startTime = System.currentTimeMillis();
-	    							System.out.println("Started moving, waiting for 60...");
-	    							statusString = "Started moving, waiting for 60...";
+	    							System.out.println("Started moving, waiting for 1/4 Mile...");
+	    							statusString = "Started moving, waiting for 1/4 Mile...";
 	    							motionWaiting = false;
 	    							recording = true;
 	    							startDistance = onBoardDisplay.dataHandler.decodePIDRead(onBoardDisplay.carInterface.readPID(pid2.ID,false),pid2);
@@ -215,14 +214,12 @@ public class TrackTest {
 						try {
 							Thread.sleep(10);
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					} else {
 						try {
 							Thread.sleep(1000);
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}
@@ -241,7 +238,6 @@ public class TrackTest {
 	        	try {
 					trackTestLoop.join();
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 	        }

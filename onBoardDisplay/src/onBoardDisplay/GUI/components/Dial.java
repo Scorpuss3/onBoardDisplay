@@ -14,19 +14,22 @@ import onBoardDisplay.dataHandling.PID;
 public class Dial {	
 	//All components' locations are specified as proportions of generic sizes shown (including width and height) for scalability.
 	public PID pid;
-	public int genericWidth, genericHeight;
+	public int realWidth, realHeight;//True GUI Dimentions (before aspect recalculations performed)
+	public int genericWidth, genericHeight;//Used for positioning dial contents.
 	public int startX, startY;
 	public float xMod, yMod, fontMod;//Font needs separate modifier, currently calculated from width mod.
 	protected ImagePart[] images;
 	protected Text[] texts;
-	protected Pin[] pins;
+	public Pin[] pins;
 	
-	public Dial(PID pid, int startX, int startY, int genericHeight, int genericWidth, int realWidth, int realHeight) {
+	public Dial(PID pid, int startX, int startY, int genericWidth, int genericHeight, int realWidth, int realHeight) {
 		this.pid = pid;
 		this.startX = startX;
 		this.startY = startY;
 		this.genericWidth = genericWidth;//Larger numbers encouraged for detail, but mainly here for proportions.
 		this.genericHeight = genericHeight;
+		this.realWidth = realWidth;
+		this.realHeight = realHeight;
 		xMod = (float)realWidth / (float)genericWidth;
 		yMod = (float)realHeight / (float)genericHeight;
 		fontMod = xMod;

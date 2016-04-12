@@ -16,15 +16,15 @@ import onBoardDisplay.onBoardDisplay;;
 
 public class CarInterfacing {
 	public static class CarInterface {
+		public boolean initialised = false;
 		private byte obdMode = 0;
-		private int networkMode = 0; //1 = connected, 0 = no connection...//TODO actually implement this. Or bodge so it works.
+		private int networkMode = 0; //1 = connected, 0 = no connection...
 		private Socket dataSocket;
 		private PrintWriter ECUin;
 		private BufferedReader ECUout;
 		private int port = 35000;
 		private String hostName = "192.168.0.10";
 		public CarInterface() {
-			//TODO Initialisation of car interface.
 			System.out.print("Creating Socket Connection...");
 			try {
 				dataSocket = new Socket(hostName, port);
@@ -52,6 +52,7 @@ public class CarInterfacing {
 			}
 			System.out.println("Socket Created");
 			getSupportedPIDs();
+			initialised = true;
 		}
 		
 		private void setMode(Byte mode) {
@@ -133,7 +134,6 @@ public class CarInterfacing {
 		
 		public short[] getErrorCodes() {
 			//A single error code can be defined in 2 bytes, which is the size of short.
-			//TODO Error Code reading stuff. Uncomment below
 			int numOfErrors = getNumOfErrors();
 			System.out.print("Number of error codes from pid:"); System.out.println(numOfErrors);
 			byte[] rawBytes = submitToECU("03",numOfErrors*2+1);
@@ -154,12 +154,11 @@ public class CarInterfacing {
 			System.out.println(dtcShorts[0]);
 			System.out.println(dtcShorts[1]);
 			//return dtcShorts;//TODO turn this back on...
-			short[] fakeShorts ={(short) 2,(short) 24, (short) 4905};
+			short[] fakeShorts ={(short) 2,(short) 24, (short) 4904};
 			return fakeShorts;
 		}
 		
 		public byte[] submitToECU(String submitString, int expectedBytes) {
-			//TODO Sensor Reading stuff.
 			int numOfCmdBytes = submitString.split(" ").length; 
 			if (networkMode == 0) {
 				byte[] ba = {(byte)0,(byte)0,(byte)0,(byte)0,(byte)0,(byte)0};// Probably covers everything, false because no connection
@@ -181,7 +180,6 @@ public class CarInterfacing {
 				//while ((response = ECUout.readLine()) != null) {
 				while ((response = ECUout.readLine()) != ">") {
 					//while (!(response = ECUout.readLine()).equals(">")) {
-					//TODO Handle ECU output...
 					System.out.println("Raw:"+response);
 					//System.out.print("Length:"); System.out.println(response.length());
 					if (response.length() != 0) {
@@ -296,7 +294,6 @@ public class CarInterfacing {
 //						try {
 //							System.in.read();
 //						} catch (IOException e) {
-//							// TODO Auto-generated catch block
 //							e.printStackTrace();
 //						}
 						//System.out.println("Retrying read...");
@@ -364,7 +361,6 @@ public class CarInterfacing {
 				ECUout.close();
 				ECUin.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (NullPointerException e) {}
 		}

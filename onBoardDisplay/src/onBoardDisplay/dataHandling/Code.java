@@ -24,7 +24,6 @@ public class Code {
 	}
 	
 	public static int getDatabaseID(short ID) {
-		//TODO talk about this in project
 		/*TO continue using shorts, the IDs used in my software are signed, so have
 		 * Weird values. To be able to interface with a database that only has
 		 * positive keys, I have to convert from signed to unsigned in the form of an

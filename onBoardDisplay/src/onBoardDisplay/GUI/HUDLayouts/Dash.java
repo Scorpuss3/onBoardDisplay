@@ -47,7 +47,7 @@ public class Dash {
 				};
 		//private static BarWidget barWidget = new BarWidget(pidList[1],900,150,30,200,pidList[1].min,pidList[1].max,false);
 		private Menu.MenuPanel.Option[] buttons = new Menu.MenuPanel.Option[] {
-			new Menu.MenuPanel.Option("Select Layout",55,onBoardDisplay.graphicsHeight-60-55,400,60,null) {
+			new Menu.MenuPanel.Option("Select Layout",55,onBoardDisplay.graphicsHeight-60-55,300,60,null) {
 				@Override
 				public void action() {
 					JPanel dialogPanel = new JPanel();
@@ -71,13 +71,26 @@ public class Dash {
 			        }
 				}
 			},
-			new Menu.MenuPanel.Option("Exit",55+400+5,onBoardDisplay.graphicsHeight-60-55,350,60,null) {
+			new Menu.MenuPanel.Option("New Layout",55+300+5,onBoardDisplay.graphicsHeight-60-55,300,60,null) {
 				@Override
 				public void action() {
-					keyAction("ESCAPE");
+					String name = JOptionPane.showInputDialog(null,"Enter New Dash Layout Name:");
+					DashArrangement newArr = new DashArrangement(name, true,
+							new DialSkin1[] {},
+							new BarWidget[] {},
+							new GraphWidget[] {}
+					);
+					DashArrangement[] newArrangements = new DashArrangement[arrangements.length+1];
+					for (int i = 0; i < arrangements.length; i++) {
+						newArrangements[i] = arrangements[i];
+					}
+					newArrangements[arrangements.length] = newArr;
+					arrangements = newArrangements;
+					currentArrangementID = arrangements.length-1;
+					currentArrangement = newArr;
 				}
 			},
-			new Menu.MenuPanel.Option("Edit Layout",55+800+10,onBoardDisplay.graphicsHeight-60-55,300,60,null) {
+			new Menu.MenuPanel.Option("Edit Layout",55+600+10,onBoardDisplay.graphicsHeight-60-55,300,60,null) {
 				@Override
 				public void action() {
 					if (currentArrangement.customisable) {
@@ -91,10 +104,16 @@ public class Dash {
 						System.out.println("Tried to edit non-customisable dash arrangement.");
 					}
 				}
+			},
+			new Menu.MenuPanel.Option("Exit",55+900+15,onBoardDisplay.graphicsHeight-60-55,250,60,null) {
+				@Override
+				public void action() {
+					keyAction("ESCAPE");
+				}
 			}
 		};
 		int currentArrangementID = 0;
-		DashArrangement[] arrangements = new DashArrangement[] {
+		public static DashArrangement[] arrangements = new DashArrangement[] {
 				new DashArrangement("Default", false,
 						new DialSkin1[] {new DialSkin1(pidList[0],100,150,200,200,pidList[0].min,pidList[0].max,(float)0.8),
 								new DialSkin1(pidList[1],100,400,200,200,pidList[1].min,pidList[1].max,(float)0.8),
@@ -117,15 +136,15 @@ public class Dash {
 						new DialSkin1[] {},
 						new BarWidget[] {},
 						new GraphWidget[] {}
-				)
+				),
 		};
 		DashArrangement currentArrangement = arrangements[0];
 		
 		public static class DashArrangement {
 			public String name;
 			public boolean customisable;
-			private DialSkin1[] dialList;
-			private BarWidget[] barList;
+			public DialSkin1[] dialList;
+			public BarWidget[] barList;
 			private GraphWidget[] graphList;
 			
 			public DashArrangement(String name, boolean customisable, DialSkin1[] dl, BarWidget[] bl, GraphWidget[] gl) {
@@ -190,7 +209,6 @@ public class Dash {
                     running = false;
                     onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "menuPanel");
                     onBoardDisplay.menuPanel.startSensing();
-                    //TODO link back to previous screen by starting its run and showing it.
                 } else if (actionString.equals("CONFIRM")) {
                 	for (Option option  : buttons) {
                         if (option.selected) {
@@ -226,7 +244,6 @@ public class Dash {
 						//try {
 						//	Thread.sleep(100);
 						//} catch (InterruptedException e) {
-						//	// TODO Auto-generated catch block
 						//	e.printStackTrace();
 						//}
 					}
@@ -245,7 +262,6 @@ public class Dash {
 	        	try {
 					dashLoop.join();
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 	        }
@@ -278,7 +294,7 @@ public class Dash {
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsWidth-100),
                     onBoardDisplay.ModifyAspect(onBoardDisplay.graphicsHeight-100));
             g2d.setFont(new Font("Gill Sans", Font.BOLD , onBoardDisplay.ModifyAspect(60)));
-            g2d.drawString("Virtual Dashboard", onBoardDisplay.ModifyAspectX(55),
+            g2d.drawString("Dash - "+currentArrangement.name, onBoardDisplay.ModifyAspectX(55),
                     onBoardDisplay.ModifyAspectY(100));
             
             g2d.setFont(new Font("Gill Sans", Font.BOLD ,
@@ -323,6 +339,7 @@ public class Dash {
             UpdateLoop dashUpdateLoop = new UpdateLoop();
             //dashUpdateLoop.start();
             setVisible(true);
+            onBoardDisplay.dataHandler.loadDashArrangements();
             System.out.println("Dash Panel setup done, waiting for run command.");
         }
 	}

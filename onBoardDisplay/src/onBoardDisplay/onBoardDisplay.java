@@ -57,7 +57,6 @@ public class onBoardDisplay {
 		try {
 			currentJar = new File(dataHandler.getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
 		} catch (URISyntaxException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		final ArrayList<String> command = new ArrayList<String>();
@@ -68,7 +67,6 @@ public class onBoardDisplay {
 		try {
 			builder.start();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.exit(0);

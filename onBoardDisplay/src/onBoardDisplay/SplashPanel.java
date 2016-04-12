@@ -16,7 +16,6 @@ public class SplashPanel extends JPanel{
 		try {
 			image = ImageIO.read(getClass().getResourceAsStream("/onBoardDisplay/Res/LoadingBar.png"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

@@ -27,6 +27,7 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import onBoardDisplay.*;
+import onBoardDisplay.carInterfacing.CarInterfacing.CarInterface;
 import onBoardDisplay.dataHandling.PID;
 
 public class Menu {
@@ -105,7 +106,6 @@ public class Menu {
                         stopSensing();
                     }
                 },
-                //TODO add options for other HUDs.
                 new Option("Back") {
                     @Override
                     public void action() {
@@ -228,6 +228,17 @@ public class Menu {
                         onBoardDisplay.profileName = newName;
                         onBoardDisplay.dataHandler.saveOptions();
                     }
+                }
+            },
+            new Option("Reconnect Adaptor") {
+                @Override
+                public void action() {
+                	this.currentCaption = "RECONNECTING...";
+                	onBoardDisplay.carInterface = new CarInterface();
+                	while (!onBoardDisplay.carInterface.initialised) {
+                		this.currentCaption = "RECONNECTING...";
+                	}
+                	this.currentCaption = "Reconnect Adaptor"; 
                 }
             },
             new Option("Back") {

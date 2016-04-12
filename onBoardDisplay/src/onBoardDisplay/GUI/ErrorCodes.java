@@ -154,7 +154,6 @@ public class ErrorCodes {
 				shownCodes.add(newOption);
 				y = y + spacing;
 			}
-			//TODO Add scan running stuff here to collect data and prepare for painting.
 		}
 		
 		public void startRun() {

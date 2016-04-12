@@ -14,7 +14,7 @@ import onBoardDisplay.GUI.components.Dial;
 import onBoardDisplay.dataHandling.PID;
 
 public class BarWidget extends Dial{
-	private boolean drawHorizontal;
+	public boolean drawHorizontal;
 	private float readingProportion;
 	private int max, min;
 	public BarWidget(PID pid, int startX, int startY, int realWidth, int realHeight, int min, int max, boolean drawHorizontal) {

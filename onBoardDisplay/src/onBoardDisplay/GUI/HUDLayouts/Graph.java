@@ -63,7 +63,6 @@ public class Graph {
 			new Menu.MenuPanel.Option("Select PIDs",55+400+5,onBoardDisplay.graphicsHeight-60-55,350,60,null) {
 				@Override
 				public void action() {
-					//TODO Add graphing PID selection
 					PID[] selected = onBoardDisplay.dataHandler.selectSupportedPIDsDialog(4,true);
 					try {
 						if (selected[1]!=null) {
@@ -161,14 +160,12 @@ public class Graph {
 						//try {
 						//	Thread.sleep(200);
 						//} catch (InterruptedException e) {
-						//	// TODO Auto-generated catch block
 						//	e.printStackTrace();
 						//}
 		            } else {//Keeps the while loop from garbage collecting itself.
 						try {
 							Thread.sleep(1000);
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}
@@ -185,7 +182,6 @@ public class Graph {
 	        	try {
 					graphLoop.join();
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 	        }

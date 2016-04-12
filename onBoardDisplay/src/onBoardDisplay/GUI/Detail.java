@@ -227,6 +227,12 @@ public class Detail {
         	int width = 550;
         	int frontWidth = 250;
         	int height = 190;
+        	g2d.drawImage(DataHandler.majorLocationCodeTextures.get("UNK")[0],
+                    onBoardDisplay.ModifyAspectX(onBoardDisplay.graphicsWidth- (width/2) - (frontWidth/2) - fromTop),
+                    onBoardDisplay.ModifyAspectY(fromTop),
+                    onBoardDisplay.ModifyAspect(frontWidth),
+                    onBoardDisplay.ModifyAspect(height),
+                    this);
         	g2d.drawImage(currentFrontImg,
                     onBoardDisplay.ModifyAspectX(onBoardDisplay.graphicsWidth- (width/2) - (frontWidth/2) - fromTop),
                     onBoardDisplay.ModifyAspectY(fromTop),
@@ -240,6 +246,12 @@ public class Detail {
         			height,
         			minorLocation,
         			ImageType.FRONT);
+        	g2d.drawImage(DataHandler.majorLocationCodeTextures.get("UNK")[1],
+                    onBoardDisplay.ModifyAspectX(onBoardDisplay.graphicsWidth-width-fromTop),
+                    onBoardDisplay.ModifyAspectY(fromTop+height+spacing),
+                    onBoardDisplay.ModifyAspect(width),
+                    onBoardDisplay.ModifyAspect(height),
+                    this);
         	g2d.drawImage(currentSideImg,
                     onBoardDisplay.ModifyAspectX(onBoardDisplay.graphicsWidth-width-fromTop),
                     onBoardDisplay.ModifyAspectY(fromTop+height+spacing),
@@ -253,6 +265,12 @@ public class Detail {
         			height,
         			minorLocation,
         			ImageType.SIDE);
+        	g2d.drawImage(DataHandler.majorLocationCodeTextures.get("UNK")[2],
+                    onBoardDisplay.ModifyAspectX(onBoardDisplay.graphicsWidth-width-fromTop),
+                    onBoardDisplay.ModifyAspectY(fromTop+height*2+spacing*2),
+                    onBoardDisplay.ModifyAspect(width),
+                    onBoardDisplay.ModifyAspect(height),
+                    this);
         	g2d.drawImage(currentTopImg,
                     onBoardDisplay.ModifyAspectX(onBoardDisplay.graphicsWidth-width-fromTop),
                     onBoardDisplay.ModifyAspectY(fromTop+height*2+spacing*2),

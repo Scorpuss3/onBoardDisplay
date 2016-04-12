@@ -30,6 +30,11 @@ import javax.swing.JPanel;
 //import com.sun.prism.paint.Color;
 
 import onBoardDisplay.onBoardDisplay;
+import onBoardDisplay.GUI.HUDLayouts.Dash;
+import onBoardDisplay.GUI.HUDLayouts.Dash.DashPanel.DashArrangement;
+import onBoardDisplay.GUI.components.dials.BarWidget;
+import onBoardDisplay.GUI.components.dials.DialSkin1;
+import onBoardDisplay.GUI.components.dials.GraphWidget;
 
 public class DataHandler {
 	public static char[] hexChars = "0123456789ABCDEF".toCharArray();
@@ -145,7 +150,6 @@ public class DataHandler {
 	}
 	
 	public Location getMinorLocation (String vehicleName, String locationName) {
-		//TODO Add location database for Error Codes and PIDs
 		//in percentages...
 		int x=0, y=0, z=0;
 		Statement st;
@@ -162,7 +166,6 @@ public class DataHandler {
 			//c.commit();
 			//c.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.print("Location of Component found: "); System.out.print(x); System.out.print(y); System.out.println(z);
@@ -170,7 +173,6 @@ public class DataHandler {
 	}
 	
 	public String getMajorLocation (String vehicleName, String locationName) {
-		//TODO Add location database for Error Codes and PIDs
 		//in percentages...
 		String majorLocation = "";
 		Statement st;
@@ -185,7 +187,6 @@ public class DataHandler {
 			//c.commit();
 			//c.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.print("Location of Component found: "); System.out.print(majorLocation);
@@ -194,7 +195,6 @@ public class DataHandler {
 	
 	//TODO Remove this when possible...
 	//public static Code decodeErrorCode (short code) {
-	//	//TODO Add error code decoding.
 	//	return new Code((short)1,"A Made up Code","UNK", "Steering Wheel");
 	//}
 	
@@ -306,15 +306,153 @@ public class DataHandler {
         return selected;
 	}
 	
-	public void saveDashArrangements() {
-		//TODO add dash arrangement saving and loading...
+	public void loadDashArrangements() {
+		DashArrangement[] allArrangements = new DashArrangement[] {};
+		try {
+			InputStream inputStream = new FileInputStream("dashArrangements");
+			int streamSize = inputStream.available();
+			char[] chars014 = new char[streamSize];
+			String currentLine = "";
+			DashArrangement currentArrangement = new DashArrangement("", true, new DialSkin1[] {}, new BarWidget[] {},	new GraphWidget[] {});
+			boolean isFirstArr = true;
+			for (int i = 0; i < streamSize; i++) {
+				char character = (char)inputStream.read();
+				if (character == '\n'){
+					//System.out.println(currentLine);
+					if (currentLine.substring(0,1).toCharArray()[0]=='@') {
+						if (!isFirstArr) {
+							System.out.println("Adding new Layout");
+							DashArrangement[] newArrangements = new DashArrangement[allArrangements.length+1];
+							for (int ii = 0; ii<allArrangements.length; ii++) {
+								newArrangements[ii] = allArrangements[ii];
+							}
+							newArrangements[allArrangements.length] = currentArrangement;
+							allArrangements = newArrangements;
+						}
+						isFirstArr = false;
+						System.out.print("New Layout Found"); System.out.println(currentLine.substring(1,currentLine.length()));
+						currentArrangement = new DashArrangement(currentLine.substring(1,currentLine.length()), true, new DialSkin1[] {}, new BarWidget[] {},	new GraphWidget[] {});
+					}
+					if (currentLine.substring(0,1).toCharArray()[0]=='#') {
+						System.out.println("Adding new Layout");
+						DashArrangement[] newArrangements = new DashArrangement[allArrangements.length+1];
+						for (int ii = 0; ii<allArrangements.length; ii++) {
+							newArrangements[ii] = allArrangements[ii];
+						}
+						newArrangements[allArrangements.length] = currentArrangement;
+						allArrangements = newArrangements;
+					}
+					if (currentLine.substring(0,1).toCharArray()[0]=='*') {
+						String stringIsEditable = currentLine.substring(1,currentLine.length());
+						boolean isEditable = Boolean.parseBoolean(stringIsEditable);
+						currentArrangement.customisable = isEditable;
+					}
+					if (currentLine.substring(0,1).toCharArray()[0]=='D') {
+						String stringGraphDetails = currentLine.substring(1,currentLine.length());
+						String[] parts = stringGraphDetails.split(" ");
+						PID newPid = onBoardDisplay.dataHandler.decodePID(onBoardDisplay.dataHandler.getByteFromHexString(parts[0]));//Byte.valueOf(parts[0]));
+						DialSkin1 newDial = new DialSkin1(newPid,
+								Integer.parseInt(parts[1]),
+								Integer.parseInt(parts[2]),
+								Integer.parseInt(parts[3]),
+								Integer.parseInt(parts[4]),newPid.min,newPid.max,Float.parseFloat(parts[5]));
+						DialSkin1[] newDials = new DialSkin1[currentArrangement.dialList.length+1];
+						for (int ii = 0; ii<currentArrangement.dialList.length; ii++) {
+							newDials[ii] = currentArrangement.dialList[ii];
+						}
+						newDials[currentArrangement.dialList.length] = newDial;
+						currentArrangement.dialList = newDials;
+					}
+					if (currentLine.substring(0,1).toCharArray()[0]=='B') {
+						String stringBarDetails = currentLine.substring(1,currentLine.length());
+						String[] parts = stringBarDetails.split(" ");
+						PID newPid = onBoardDisplay.dataHandler.decodePID(onBoardDisplay.dataHandler.getByteFromHexString(parts[0]));//Byte.valueOf(parts[0]));
+						BarWidget newBar = new BarWidget(newPid,
+								Integer.parseInt(parts[1]),
+								Integer.parseInt(parts[2]),
+								Integer.parseInt(parts[3]),
+								Integer.parseInt(parts[4]),newPid.min,newPid.max,Boolean.parseBoolean(parts[5]));
+						BarWidget[] newBars = new BarWidget[currentArrangement.barList.length+1];
+						for (int ii = 0; ii<currentArrangement.barList.length; ii++) {
+							newBars[ii] = currentArrangement.barList[ii];
+						}
+						newBars[currentArrangement.barList.length] = newBar;
+						currentArrangement.barList = newBars;
+					}
+					currentLine = "";
+				} else {
+					if (character != '\r'){
+						currentLine += character;
+					}
+				}
+			}
+			inputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println(allArrangements.length);
+		Dash.DashPanel.arrangements = allArrangements;
 	}
 	
-	public void loadDashArrangements() {
-		//TODO add dash arrangement saving and loading...
+	public void saveDashArrangements() {
+		System.out.println("Saving Dash Layouts...");
+		try {
+			File oldFile = new File("dashArrangements");
+			oldFile.renameTo(new File("dashArrangements.old"));
+			oldFile = new File("dashArrangements.old");
+			OutputStream outputStream = new FileOutputStream("dashArrangements");
+			for (DashArrangement currentArrangement : Dash.DashPanel.arrangements) {
+				outputStream.write(("@"+currentArrangement.name).getBytes("UTF-8"));
+				outputStream.write('\n');
+				outputStream.write(("*"+((Boolean)currentArrangement.customisable).toString()).getBytes("UTF-8"));
+				outputStream.write('\n');
+				for (DialSkin1 dial : currentArrangement.dialList) {
+					outputStream.write(("D").getBytes("UTF-8"));
+					outputStream.write((getHexCharacters(dial.pid.ID)).getBytes("UTF-8"));
+					outputStream.write((" ").getBytes("UTF-8"));
+					outputStream.write((Integer.toString(dial.startX)).getBytes("UTF-8"));
+					outputStream.write((" ").getBytes("UTF-8"));
+					outputStream.write((Integer.toString(dial.startY)).getBytes("UTF-8"));
+					outputStream.write((" ").getBytes("UTF-8"));
+					outputStream.write((Integer.toString(dial.realWidth)).getBytes("UTF-8"));
+					outputStream.write((" ").getBytes("UTF-8"));
+					outputStream.write((Integer.toString(dial.realHeight)).getBytes("UTF-8"));
+					outputStream.write((" ").getBytes("UTF-8"));
+					outputStream.write((Float.toString(dial.pins[0].circleProportion)).getBytes("UTF-8"));
+					outputStream.write('\n');
+				}
+				for (BarWidget bar : currentArrangement.barList) {
+					outputStream.write(("B").getBytes("UTF-8"));
+					outputStream.write((getHexCharacters(bar.pid.ID)).getBytes("UTF-8"));
+					outputStream.write((" ").getBytes("UTF-8"));
+					outputStream.write((Integer.toString(bar.startX)).getBytes("UTF-8"));
+					outputStream.write((" ").getBytes("UTF-8"));
+					outputStream.write((Integer.toString(bar.startY)).getBytes("UTF-8"));
+					outputStream.write((" ").getBytes("UTF-8"));
+					outputStream.write((Integer.toString(bar.realWidth)).getBytes("UTF-8"));
+					outputStream.write((" ").getBytes("UTF-8"));
+					outputStream.write((Integer.toString(bar.realHeight)).getBytes("UTF-8"));
+					outputStream.write((" ").getBytes("UTF-8"));
+					outputStream.write((((Boolean)bar.drawHorizontal).toString()).getBytes("UTF-8"));
+					outputStream.write('\n');
+				}
+			}
+			outputStream.write('#');
+			outputStream.write('\n');
+			oldFile.delete();
+			outputStream.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void loadCarResources(String resourceName) {
+		//TODO Remove below declaration...
+		resourceName = "generic";
 		if (resourceName == "generic") {
 			try {
 				Set set = majorLocationCodeTextures.entrySet();
@@ -338,11 +476,15 @@ public class DataHandler {
 						String full = "/onBoardDisplay/Res/genericTextures/" + (String)me.getKey() + suffix;
 						System.out.println("Loading Texture: " + full);
 						buffered[i] = ImageIO.read(getClass().getResourceAsStream(full));
+						if (((String)me.getKey()).equals("UNK")) {
+							buffered[i] = tintBufferedImage(full,onBoardDisplay.guiColours[1]);
+						} else {
+							buffered[i] = tintBufferedImage(full,onBoardDisplay.guiColours[2]);
+						}
 					}
 					majorLocationCodeTextures.put((String)me.getKey(),buffered);
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -354,7 +496,6 @@ public class DataHandler {
 		try {
 			img = ImageIO.read(getClass().getResourceAsStream(location));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		for (int x = 0; x <img.getWidth(); x++) {
@@ -384,7 +525,6 @@ public class DataHandler {
 		    //rs.close();
 		    //st.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -407,7 +547,7 @@ public class DataHandler {
 					if (!getName) {
 						getName = true;
 					} else {
-						//TODO add to leaderboard a new record with score chars014 and name nameString014
+						//Adds to leaderboard a new record with score chars014 and name nameString014
 						System.out.print("\t"+nameString014);
 						System.out.print(" : ");
 						System.out.println(Double.parseDouble(scoreString014));
@@ -439,7 +579,7 @@ public class DataHandler {
 					if (!getName) {
 						getName = true;
 					} else {
-						//TODO add to leaderboard a new record with score chars014 and name nameString014
+						//Adds to leaderboard a new record with score chars014 and name nameString014
 						System.out.print("\t"+nameString060);
 						System.out.print(" : ");
 						System.out.println(Double.parseDouble(scoreString060));
@@ -462,16 +602,13 @@ public class DataHandler {
 			stream014.close();
 			stream060.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
 	public void saveLeaderBoards() {
-		//TODO Save LeaderBoards after editing.
 		System.out.println("Saving Leaderboards...");
 		if (leaderboard014.size() == 0 | leaderboard060.size() == 0) {
 			System.err.println("Tried to save empty leaderboard - aborted.");
@@ -510,13 +647,10 @@ public class DataHandler {
 			stream014.close();
 			stream060.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -546,7 +680,6 @@ public class DataHandler {
 	}
 	
 	public void saveOptions() {
-		//TODO Add loading and saving of options
 		File oldFile = new File("onBoardDisplayConfig");
 		oldFile.renameTo(new File("onBoardDisplayConfig.old"));
 		oldFile = new File("onBoardDisplayConfig.old");
@@ -569,24 +702,18 @@ public class DataHandler {
 			oldFile.delete();
 			outputStream.close();
 		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
 	public void loadOptions() {
-		//TODO Add loading and saving of options
 		System.out.println("Reading Config Options");
 		try {
 			InputStream inputStream = new FileInputStream("onBoardDisplayConfig");
-			
-			//TODO modify below this point:
 			int streamSize = inputStream.available();
 			char[] chars014 = new char[streamSize];
 			String currentLine = "";
@@ -629,7 +756,6 @@ public class DataHandler {
 			}
 			inputStream.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -659,12 +785,12 @@ public class DataHandler {
 			if (!found) {
 				newCode.IDString = Code.getStringFromID(id);
 				newCode.Description = "Unknown- code not found in database...";
+				newCode.majorLocation = "UNK";
 			}
 			st.close();
 			//c.commit();
 			//c.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return newCode;
@@ -703,7 +829,6 @@ public class DataHandler {
 			//c.commit();
 			//c.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return newPID;

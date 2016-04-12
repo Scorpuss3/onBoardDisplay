@@ -38,6 +38,7 @@ public class DashCustomisation {
 		private float bufferCircleProportion = (float)0.8;
 		private boolean bufferIsHorizontal = false;
 		private int addingStage = 0;//1 = Starts coordinates, 2=width and height, 3=orientation (bar only)
+		private boolean deleting = false;
 		private Menu.MenuPanel.Option[] buttons = new Menu.MenuPanel.Option[] {
 			new Menu.MenuPanel.Option("Add Dial",55,onBoardDisplay.graphicsHeight-60-55,250,60,null) {
 				@Override
@@ -49,6 +50,7 @@ public class DashCustomisation {
 						bufferMin = newPid.min;
 						bufferMax = newPid.max;
 						addingDial = true;
+						addingBar = false;
 						addingStage = 1;
 					} catch (Exception e) {
 					}
@@ -64,12 +66,22 @@ public class DashCustomisation {
 						bufferMin = newPid.min;
 						bufferMax = newPid.max;
 						addingBar = true;
+						addingDial = false;
 						addingStage = 1;
 					} catch (Exception e) {
 					}
 				}
 			},
-			new Menu.MenuPanel.Option("Save",55+500+10,onBoardDisplay.graphicsHeight-60-55,250,60,null) {
+			new Menu.MenuPanel.Option("Delete Item",55+500+10,onBoardDisplay.graphicsHeight-60-55,250,60,null) {
+				@Override
+				public void action() {
+					System.out.println("Started item deleting, waiting for selection.");
+					helpMessage = "Click on Item to Delete";
+					deleting = true;
+					helpMessage = "";
+				}
+			},
+			new Menu.MenuPanel.Option("Save",55+750+10,onBoardDisplay.graphicsHeight-60-55,250,60,null) {
 				@Override
 				public void action() {
 					DashArrangement newArrangement = new DashArrangement(onBoardDisplay.dashPanel.currentArrangement.name, true,
@@ -83,7 +95,7 @@ public class DashCustomisation {
 					keyAction("ESCAPE");
 				}
 			},
-			new Menu.MenuPanel.Option("Exit",55+750+15,onBoardDisplay.graphicsHeight-60-55,250,60,null) {
+			new Menu.MenuPanel.Option("Exit",55+1000+15,onBoardDisplay.graphicsHeight-60-55,150,60,null) {
 				@Override
 				public void action() {
 					keyAction("ESCAPE");
@@ -97,10 +109,7 @@ public class DashCustomisation {
             int trueYPos = e.getY();
             int xPos = (int)((trueXPos - onBoardDisplay.xOffset)/onBoardDisplay.graphicsMultiplier);
             int yPos = (int)((trueYPos - onBoardDisplay.yOffset)/onBoardDisplay.graphicsMultiplier);
-            //System.out.print("Mouse press at "); System.out.print(xPos);
-            //System.out.print(","); System.out.println(yPos);
             for (Option option : buttons) {
-                //System.out.print(option.currentCaption); System.out.print(option.xPosition); System.out.println(option.yPosition);
                 if (xPos >= option.xPosition &&
                         (xPos <= (option.xPosition + option.width) &&
                         yPos >= option.yPosition &&
@@ -140,6 +149,59 @@ public class DashCustomisation {
             	break;
             }
             addingStage++;
+            
+            //Deletes dial or bar when clicked on.
+            if (deleting) {
+            	int deleteIndex = -1;
+            	boolean deletingDial = false, deletingBar = false;
+            	int count = 0;
+            	for (DialSkin1 currentDial : dialList) {
+            		if (xPos >= currentDial.startX &&
+                            (xPos <= (currentDial.startX + currentDial.realWidth) &&
+                            yPos >= currentDial.startY &&
+                            yPos <= (currentDial.startY + currentDial.realHeight))) {
+            			deleteIndex = count; 
+            			deletingDial = true;
+        				System.out.println("Found item to be deleted.");
+                    }
+            		count++;
+            	}
+            	count = 0;
+            	for (BarWidget currentBar : barList) {
+            		if (xPos >= currentBar.startX &&
+                            (xPos <= (currentBar.startX + currentBar.realWidth) &&
+                            yPos >= currentBar.startY &&
+                            yPos <= (currentBar.startY + currentBar.realHeight))) {
+            			deleteIndex = count; 
+            			deletingBar = true;
+        				System.out.println("Found item to be deleted.");
+                    }
+            		count++;
+            	}
+            	if (deletingDial) {
+            		DialSkin1[] newDials = new DialSkin1[dialList.length-1];
+            		int newIndex = 0;
+            		for (int i = 0; i< dialList.length; i++) {
+            			if (i != deleteIndex) {
+            				newDials[newIndex] = dialList[i];
+            				newIndex++;
+            			}
+            		}
+            		dialList = newDials;
+            	}
+            	if (deletingBar) {
+            		BarWidget[] newBars = new BarWidget[barList.length-1];
+            		int newIndex = 0;
+            		for (int i = 0; i< barList.length; i++) {
+            			if (i != deleteIndex) {
+            				newBars[newIndex] = barList[i];
+            				newIndex++;
+            			}
+            		}
+            		barList = newBars;
+            	}
+            	deleting = false;
+            }
             repaint();
         }
 		
@@ -197,7 +259,6 @@ public class DashCustomisation {
                     running = false;
                     onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "dashPanel");
                     onBoardDisplay.dashPanel.startRun();
-                    //TODO link back to previous screen by starting its run and showing it.
                 } else if (actionString.equals("CONFIRM")) {
                 	for (Option option  : buttons) {
                         if (option.selected) {
@@ -270,8 +331,6 @@ public class DashCustomisation {
             	selectedBar.draw(g2d, this);
 			}
             g2d.drawString(helpMessage, onBoardDisplay.ModifyAspectX(100), onBoardDisplay.ModifyAspectY(150));
-            //barWidget.update(onBoardDisplay.dataHandler.decodePIDRead(new byte[] {0x11}, barWidget.pid),barWidget.pid.unit);
-            //barWidget.draw(g2d, this);
 		}
 		
 		public DashCustomisationPanel(int width,int height) {
