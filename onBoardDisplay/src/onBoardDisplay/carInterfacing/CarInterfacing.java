@@ -153,9 +153,9 @@ public class CarInterfacing {
 			System.out.print("Read some DTCs: ");
 			System.out.println(dtcShorts[0]);
 			System.out.println(dtcShorts[1]);
-			//return dtcShorts;//TODO turn this back on...
-			short[] fakeShorts ={(short) 2,(short) 24, (short) 4904, (short) 112};
-			return fakeShorts;
+			return dtcShorts;//TODO turn this back on...
+			//short[] fakeShorts ={(short) 2,(short) 24, (short) 4904, (short) 112};
+			//return fakeShorts;
 		}
 		
 		public byte[] submitToECU(String submitString, int expectedBytes) {
