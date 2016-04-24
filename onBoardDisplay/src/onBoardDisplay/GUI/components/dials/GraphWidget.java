@@ -18,10 +18,10 @@ import onBoardDisplay.GUI.components.Dial.Text;
 import onBoardDisplay.dataHandling.PID;
 
 public class GraphWidget extends Dial{
-	private PID[] displayedPIDs;
+	public PID[] displayedPIDs;
 	private float[] times;
 	private HashMap<PID,float[]> dataStore = new HashMap<PID,float[]>(){};
-	private int maxMemoryRecords;
+	public int maxMemoryRecords;
 	private Color[] colors = {Color.red, Color.blue, Color.green, Color.orange, Color.pink};
 	private int timeCaptionInterval = 50;
 	
@@ -83,18 +83,12 @@ public class GraphWidget extends Dial{
 	}
 	
 	public void draw(Graphics2D g2d, JPanel panel) {
-//		g2d.drawImage(images[0].image,
-//				onBoardDisplay.ModifyAspectX(startX + (images[0].relativeX) * xMod),
-//				onBoardDisplay.ModifyAspectY(startY + (images[0].relativeY) * yMod),
-//				onBoardDisplay.ModifyAspect(images[0].relativeWidth * xMod),
-//				onBoardDisplay.ModifyAspect(images[0].relativeHeight * yMod),
-//				panel);
-//		System.out.println("Image Location Data:");
-//		System.out.println(startX + (images[0].relativeX) * xMod);
-//		System.out.println(startY + (images[0].relativeY) * yMod);
-//		System.out.println(images[0].relativeWidth * xMod);
-//		System.out.println(images[0].relativeHeight * yMod);
-		
+		g2d.drawImage(images[0].image,
+				onBoardDisplay.ModifyAspectX(startX + (images[0].relativeX) * xMod),
+				onBoardDisplay.ModifyAspectY(startY + (images[0].relativeY) * yMod),
+				onBoardDisplay.ModifyAspect(images[0].relativeWidth * xMod),
+				onBoardDisplay.ModifyAspect(images[0].relativeHeight * yMod),
+				panel);
 		float timeSpan;
 		try {
 			timeSpan = times[times.length-1]-times[0];
@@ -136,7 +130,7 @@ public class GraphWidget extends Dial{
 					g2d.drawString(Float.toString(newTime/(float)1000.0), onBoardDisplay.ModifyAspectX(startX + (newTimePlot) * xMod), onBoardDisplay.ModifyAspectY(startY + (400) * yMod));
 				}
 			}
-			g2d.drawString("Records: "+Integer.toString(length),  onBoardDisplay.ModifyAspectX(startX + (0) * xMod), onBoardDisplay.ModifyAspectY(startY + (100) * yMod));
+			g2d.drawString("Records: "+Integer.toString(length),  onBoardDisplay.ModifyAspectX(startX + (0) * xMod), onBoardDisplay.ModifyAspectY(startY + (0) * yMod));
 		}
 	}
 }

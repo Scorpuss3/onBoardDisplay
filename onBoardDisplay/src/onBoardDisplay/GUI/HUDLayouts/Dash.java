@@ -145,7 +145,7 @@ public class Dash {
 			public boolean customisable;
 			public DialSkin1[] dialList;
 			public BarWidget[] barList;
-			private GraphWidget[] graphList;
+			public GraphWidget[] graphList;
 			
 			public DashArrangement(String name, boolean customisable, DialSkin1[] dl, BarWidget[] bl, GraphWidget[] gl) {
 				this.name = name;
@@ -239,6 +239,11 @@ public class Dash {
 							System.out.print("Decoded Value:"); System.out.println(onBoardDisplay.dataHandler.decodePIDRead(rawBytes, selectedBar.pid));
 							selectedBar.update(onBoardDisplay.dataHandler.decodePIDRead(rawBytes, selectedBar.pid),selectedBar.pid.unit);
 						}
+						for (GraphWidget selectedGraph : currentArrangement.graphList) {
+							byte[] rawBytes = onBoardDisplay.carInterface.readPID(selectedGraph.displayedPIDs[0].ID, false);//TODO consider turning autoretry on...
+							System.out.print("Decoded Value:"); System.out.println(onBoardDisplay.dataHandler.decodePIDRead(rawBytes, selectedGraph.displayedPIDs[0]));
+							selectedGraph.update(System.currentTimeMillis());
+						}
 						//onBoardDisplay.hudPanel.dashPanel.repaint();
 						onBoardDisplay.dashPanel.repaint();
 						//try {
@@ -327,6 +332,9 @@ public class Dash {
 			}
             for (BarWidget selectedBar : currentArrangement.barList) {
             	selectedBar.draw(g2d, this);
+			}
+            for (GraphWidget selectedGraph : currentArrangement.graphList) {
+            	selectedGraph.draw(g2d, this);
 			}
             //barWidget.update(onBoardDisplay.dataHandler.decodePIDRead(new byte[] {0x11}, barWidget.pid),barWidget.pid.unit);
             //barWidget.draw(g2d, this);

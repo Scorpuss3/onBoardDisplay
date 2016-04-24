@@ -21,6 +21,7 @@ import java.util.TreeMap;
 import java.sql.*;
 
 import javax.imageio.ImageIO;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -244,10 +245,14 @@ public class DataHandler {
 		}
 		PID[] pids = new PID[tally];
 		int index = 0;
+		set = supportedPIDs.entrySet();
+		it = set.iterator();
 		while (it.hasNext()) {
 			Map.Entry me = (Map.Entry)it.next();
 			if (((boolean) me.getValue())) {
-				pids[index] = onBoardDisplay.dataHandler.decodePID((byte)me.getKey());
+				PID newPid = onBoardDisplay.dataHandler.decodePID((byte)me.getKey());
+				System.out.print("Found PID:"); System.out.println(newPid.Description);
+				pids[index] = newPid;
 				index++;
 			}
 		}
@@ -266,6 +271,7 @@ public class DataHandler {
 	public PID[] selectSupportedPIDsDialog(int numberToChoose, boolean onlyUseAvailable) {
 		PID[] selected  = new PID[numberToChoose];
 		JPanel dialogPanel = new JPanel();
+		dialogPanel.setLayout(new BoxLayout(dialogPanel,BoxLayout.Y_AXIS));//Makes panel add items vertically...
 		dialogPanel.add(new JLabel("Select " + Integer.toString(numberToChoose)+" PIDs:"));
 		PID[] selectionUsed;
 		if (onlyUseAvailable) {
@@ -274,17 +280,20 @@ public class DataHandler {
 			selectionUsed = getAllPids();
 		}
 		
-		DefaultComboBoxModel model = new DefaultComboBoxModel();
-        for (PID pid: selectionUsed) {
-            //model.addElement(pid.ID);
-        	model.addElement(pid.Description);
-        }
-        JComboBox[] comboBoxes = new JComboBox[numberToChoose];
-        for (int i = 0; i< numberToChoose; i++) {
-        	JComboBox comboBox= new JComboBox(model);
-            dialogPanel.add(comboBox);
-            comboBoxes[i] = comboBox;
-        }
+		JComboBox[] comboBoxes = new JComboBox[numberToChoose];
+		for (int i = 0; i < numberToChoose; i++) {
+			DefaultComboBoxModel model = new DefaultComboBoxModel();
+	        for (PID pid: selectionUsed) {
+	            //model.addElement(pid.ID)
+	        	try {
+	        	model.addElement(pid.Description);
+	        	} catch (Exception e) {//Sometimes no description found when weird PID. Some not included in list, mainly pid 0.
+	        	}
+	        }
+	        JComboBox comboBox= new JComboBox(model);
+	        dialogPanel.add(comboBox);
+	        comboBoxes[i] = comboBox;
+		}
         int confirmed = JOptionPane.showConfirmDialog(null, dialogPanel, "PID", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (confirmed == JOptionPane.OK_OPTION) {
         	for (int i = 0; i < numberToChoose; i++) {
@@ -299,7 +308,8 @@ public class DataHandler {
         				}
         	        }
         		} catch (Exception e) {
-        			selected[0] = new PID();
+        			System.out.println("Failed, added fake pid.");
+        			selected[i] = new PID();
         		}
         	}
         }
@@ -379,6 +389,22 @@ public class DataHandler {
 						newBars[currentArrangement.barList.length] = newBar;
 						currentArrangement.barList = newBars;
 					}
+					if (currentLine.substring(0,1).toCharArray()[0]=='G') {
+						String stringGraphDetails = currentLine.substring(1,currentLine.length());
+						String[] parts = stringGraphDetails.split(" ");
+						PID newPid = onBoardDisplay.dataHandler.decodePID(onBoardDisplay.dataHandler.getByteFromHexString(parts[0]));//Byte.valueOf(parts[0]));
+						GraphWidget newGraph = new GraphWidget(new PID[] {newPid},
+								Integer.parseInt(parts[1]),
+								Integer.parseInt(parts[2]),
+								Integer.parseInt(parts[3]),
+								Integer.parseInt(parts[4]),Integer.parseInt(parts[5]));
+						GraphWidget[] newGraphs = new GraphWidget[currentArrangement.graphList.length+1];
+						for (int ii = 0; ii<currentArrangement.graphList.length; ii++) {
+							newGraphs[ii] = currentArrangement.graphList[ii];
+						}
+						newGraphs[currentArrangement.graphList.length] = newGraph;
+						currentArrangement.graphList = newGraphs;
+					}
 					currentLine = "";
 				} else {
 					if (character != '\r'){
@@ -434,6 +460,21 @@ public class DataHandler {
 					outputStream.write((Integer.toString(bar.realHeight)).getBytes("UTF-8"));
 					outputStream.write((" ").getBytes("UTF-8"));
 					outputStream.write((((Boolean)bar.drawHorizontal).toString()).getBytes("UTF-8"));
+					outputStream.write('\n');
+				}
+				for (GraphWidget graph : currentArrangement.graphList) {
+					outputStream.write(("G").getBytes("UTF-8"));
+					outputStream.write((getHexCharacters(graph.displayedPIDs[0].ID)).getBytes("UTF-8"));
+					outputStream.write((" ").getBytes("UTF-8"));
+					outputStream.write((Integer.toString(graph.startX)).getBytes("UTF-8"));
+					outputStream.write((" ").getBytes("UTF-8"));
+					outputStream.write((Integer.toString(graph.startY)).getBytes("UTF-8"));
+					outputStream.write((" ").getBytes("UTF-8"));
+					outputStream.write((Integer.toString(graph.realWidth)).getBytes("UTF-8"));
+					outputStream.write((" ").getBytes("UTF-8"));
+					outputStream.write((Integer.toString(graph.realHeight)).getBytes("UTF-8"));
+					outputStream.write((" ").getBytes("UTF-8"));
+					outputStream.write((Integer.toString(graph.maxMemoryRecords)).getBytes("UTF-8"));
 					outputStream.write('\n');
 				}
 			}

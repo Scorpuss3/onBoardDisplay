@@ -35,8 +35,11 @@ public class TrackTest {
 		private boolean scanning = false;
 		private boolean motionWaiting = false;
 		private float currentSpeed = 0;
+		private float oldSpeed = 0;
 		private float currentDistance = 0;
 		private float startDistance = 0;
+		private long oldTime = 0;
+		private long newTime = 0;
 		private String statusString = "Waiting for speed to get to 0...";
 		private UpdateLoop trackTestUpdateLoop = new UpdateLoop();
 		private long startTime = 0;
@@ -146,10 +149,13 @@ public class TrackTest {
 	        public void run() {
 	            while (true)  {//TODO change this so that it can be deactivated at program close later.
 	            	if (scanning) {
+	            		oldTime = newTime;
+	            		newTime = System.currentTimeMillis();
+	            		oldSpeed = currentSpeed;
 	            		PID pid = onBoardDisplay.dataHandler.decodePID((byte)0x0D);
 	            		currentSpeed = onBoardDisplay.dataHandler.decodePIDRead(onBoardDisplay.carInterface.readPID(pid.ID,false),pid);
-    					PID pid2 = onBoardDisplay.dataHandler.decodePID((byte)0x31);
-	            		currentDistance = onBoardDisplay.dataHandler.decodePIDRead(onBoardDisplay.carInterface.readPID(pid2.ID,false),pid2);
+    					//PID pid2 = onBoardDisplay.dataHandler.decodePID((byte)0x31);
+	            		//currentDistance = onBoardDisplay.dataHandler.decodePIDRead(onBoardDisplay.carInterface.readPID(pid2.ID,false),pid2);
 	            		repaint();
 	    				if (currentMode == "0-60") {
 	    					if (recording) {//waiting for reaching 60
@@ -178,6 +184,9 @@ public class TrackTest {
 	    					}
 	    				} else {
 	    					if (recording) {//waiting for reaching 1/4 mile
+	    						newTime = System.currentTimeMillis();
+	    						float newDistance = (currentSpeed-oldSpeed)*(System.currentTimeMillis()-oldTime);//Integrating speed/
+	    						currentDistance += newDistance;
 	    						float tripDistance = currentDistance - startDistance;
 	    						if (tripDistance >= 0.4) {
 	    							long endTime = System.currentTimeMillis();
@@ -201,7 +210,8 @@ public class TrackTest {
 	    							statusString = "Started moving, waiting for 1/4 Mile...";
 	    							motionWaiting = false;
 	    							recording = true;
-	    							startDistance = onBoardDisplay.dataHandler.decodePIDRead(onBoardDisplay.carInterface.readPID(pid2.ID,false),pid2);
+	    							//startDistance = onBoardDisplay.dataHandler.decodePIDRead(onBoardDisplay.carInterface.readPID(pid2.ID,false),pid2);
+	    							startDistance = 0;
 	    						} else if (currentSpeed == 0 && !motionWaiting) {
 	    							motionWaiting = true;
 	    							System.out.println("Reached 0mph, waiting for vehicle motion before clock started...");

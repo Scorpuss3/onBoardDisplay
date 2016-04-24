@@ -78,15 +78,15 @@ public class Menu {
                         stopSensing();
                     }
                 },
-                new Option("Cylinder Info") {
-                    @Override
-                    public void action() {
-                        onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "hudPanel");
-                        onBoardDisplay.hudPanel.layout.show(onBoardDisplay.hudPanel.hudTopLayerPanel,"cylinderPanel");
-                        onBoardDisplay.hudPanel.cylinderPanel.startRun();
-                        stopSensing();
-                    }
-                },
+                //new Option("Cylinder Info") {
+                //    @Override
+                //    public void action() {
+                //        onBoardDisplay.layout.show(onBoardDisplay.topLayerPanel, "hudPanel");
+                //        onBoardDisplay.hudPanel.layout.show(onBoardDisplay.hudPanel.hudTopLayerPanel,"cylinderPanel");
+                //        onBoardDisplay.hudPanel.cylinderPanel.startRun();
+                //        stopSensing();
+                //    }
+                //},
                 new Option("Show Dash") {
                     @Override
                     public void action() {
@@ -239,6 +239,12 @@ public class Menu {
                 		this.currentCaption = "RECONNECTING...";
                 	}
                 	this.currentCaption = "Reconnect Adaptor"; 
+                }
+            },
+            new Option("Refresh Databases") {
+                @Override
+                public void action() {
+                	onBoardDisplay.dataHandler.loadDatabaseConnection(); 
                 }
             },
             new Option("Back") {

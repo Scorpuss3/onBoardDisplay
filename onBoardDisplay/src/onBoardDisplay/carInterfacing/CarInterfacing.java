@@ -154,7 +154,7 @@ public class CarInterfacing {
 			System.out.println(dtcShorts[0]);
 			System.out.println(dtcShorts[1]);
 			//return dtcShorts;//TODO turn this back on...
-			short[] fakeShorts ={(short) 2,(short) 24, (short) 4904};
+			short[] fakeShorts ={(short) 2,(short) 24, (short) 4904, (short) 112};
 			return fakeShorts;
 		}
 		

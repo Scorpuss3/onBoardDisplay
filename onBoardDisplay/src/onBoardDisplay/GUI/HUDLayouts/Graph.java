@@ -40,7 +40,7 @@ public class Graph {
 		private String statusString = "Not Recording";
 		private UpdateLoop graphUpdateLoop;// = new UpdateLoop();
 		private long startTime = 0;
-		private GraphWidget graph = new GraphWidget(pidList,100,180,700,600,200);
+		private GraphWidget graph = new GraphWidget(pidList,100,180,1000,400,200);
 		private Menu.MenuPanel.Option[] buttons = new Menu.MenuPanel.Option[] {
 			new Menu.MenuPanel.Option("Start Recording",55,onBoardDisplay.graphicsHeight-60-55,350,60,null) {
 				@Override
@@ -63,11 +63,11 @@ public class Graph {
 			new Menu.MenuPanel.Option("Select PIDs",55+400+5,onBoardDisplay.graphicsHeight-60-55,350,60,null) {
 				@Override
 				public void action() {
-					PID[] selected = onBoardDisplay.dataHandler.selectSupportedPIDsDialog(4,true);
+					PID[] selected = onBoardDisplay.dataHandler.selectSupportedPIDsDialog(4,false);//TODO change back to true
 					try {
 						if (selected[1]!=null) {
 							pidList = selected;
-							graph = new GraphWidget(pidList,100,180,700,600,200);
+							graph = new GraphWidget(pidList,graph.startX,graph.startY,graph.realWidth,graph.realHeight,graph.maxMemoryRecords);
 						} else {
 							System.out.println("Tried to create list with null PIDs, ignored...");
 						}
