@@ -1,5 +1,13 @@
 package onBoardDisplay.carInterfacing;
 
+/*
+ * This class contains all the methods for connecting to and communicating with the ELM327.
+ * It first uses sockets to connect through WiFi to the adaptor, and after that point is
+ * used as a middle-man between the software requests for data and the car's ECU. Its methods
+ * will handle repeats and retries, and decode the data from strings of Hex to useful 
+ * information.
+ */
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -24,7 +32,14 @@ public class CarInterfacing {
 		private BufferedReader ECUout;
 		private int port = 35000;
 		private String hostName = "192.168.0.10";
+		
 		public CarInterface() {
+			/*
+			 * This is the method called when the instance of this class is created. It creates the
+			 * socket connection with the ELM327 adaptor, and providing it works will call its method
+			 * for getting the vehicle's supported PIDs. The instance is then waiting for requests
+			 * from the rest of the software.
+			 */
 			System.out.print("Creating Socket Connection...");
 			try {
 				dataSocket = new Socket(hostName, port);
@@ -61,6 +76,11 @@ public class CarInterfacing {
 		}
 		
 		public void getSupportedPIDs() {
+			/*
+			 * This methods simply calls a series of requests for PIDs that should return an array of
+			 * bytes that represent whether each PID (sensor) is available or not. This information is
+			 * then stored in maps (a series of records), so that is can be retrieved for later use.
+			 */
 			byte[] check1 = readPID((byte)0x00,(byte)1,true, 4);
 			System.out.println("got here");
 			//Available 0x01(1) to 0x20(32)
@@ -111,6 +131,11 @@ public class CarInterfacing {
 		}
 		
 		public String getVIN() {
+			/*
+			 * This method simply returns a string representation of the vehicles's VIN number, which
+			 * I was hoping to later on use to automatically work out the vehicle's manufacturer instead
+			 * of it just being a text field saved as a setting.
+			 */
 			setMode((byte)0x09);
 			byte[] vinBytes = submitToECU("09 02",20);
 			for (int i = 0; i <= vinBytes.length; i++) {
@@ -128,11 +153,23 @@ public class CarInterfacing {
 		}
 		
 		public int getNumOfErrors() {
+			/*
+			 * Reads a PID that tells the software how many error codes are saved in the vehicle's ECU.
+			 * This is required for reading errors to know how long to keep reading for. 
+			 */
 			byte[] statusBytes = readPID((byte)01,(byte)1,true,4);
 			return statusBytes[0] & 0x7F;//First bit is not relevant
 		}
 		
 		public short[] getErrorCodes() {
+			/*
+			 * This method uses a call to get the data returned by the adaptor for the error codes stored
+			 * in the vehicle's ECU. It then pairs up the bytes (each error code is represented by 2 bytes)
+			 * and codes them as seperate Short (a number value with 2 bytes) values. This array of shorts
+			 * is then returned to be decoded. There is also a couple of commented out lines of code present
+			 * for faking the reading of some error codes, so that the software could be tested in development
+			 * without being connected to a vehicle.
+			 */
 			//A single error code can be defined in 2 bytes, which is the size of short.
 			int numOfErrors = getNumOfErrors();
 			System.out.print("Number of error codes from pid:"); System.out.println(numOfErrors);
@@ -155,10 +192,17 @@ public class CarInterfacing {
 			System.out.println(dtcShorts[1]);
 			return dtcShorts;//TODO turn this back on...
 			//short[] fakeShorts ={(short) 2,(short) 24, (short) 4904, (short) 112};
-			//return fakeShorts;
+			//return fakeShorts;//These are fake for testing the software when it is not connected to a car.
 		}
 		
 		public byte[] submitToECU(String submitString, int expectedBytes) {
+			/*
+			 * This method is less complicated than it looks. It takes a string command (the sensor that needs
+			 * to be read), and a number of bytes expected as a response as parameters. It decodes the string to
+			 * the format needed to be sent to the adaptor, and sends the string over the socket connection. It
+			 * then keeps reading data from the response stream, reading until it has the number of values
+			 * specified in the parameter. Then, it simply returnes the array of bytes is has recieved.
+			 */
 			int numOfCmdBytes = submitString.split(" ").length; 
 			if (networkMode == 0) {
 				byte[] ba = {(byte)0,(byte)0,(byte)0,(byte)0,(byte)0,(byte)0};// Probably covers everything, false because no connection
@@ -246,8 +290,16 @@ public class CarInterfacing {
 		}
 		
 		public byte[] readPID(byte PID, byte mode, boolean autoRetry, int expectedBytes) {
-			/* Returns the raw bytes of the PID asked for, and makes sure that some data is recieved if required.
-			 * Also checks against expected number of bytes.*/
+			/*
+			 * This method is a higher level than the submitToECU method, getting the ID of the sensor, the
+			 * mode (some sensors have different modes), a boolean specifying whether the method could retry
+			 * the read if there is a failure, and the number of expected bytes. This data is formatted to
+			 * be sent to the submitToECU method, and wraps it in functions for retrying the calls if it is
+			 * necessary. The bytes received from the above method are then edited by extracting only the
+			 * information required (for example, part of the response will be a command echo). The clones of
+			 * this method below just have slightly different parameters, from which the correct ones are
+			 * calculated, at which point control is passed straight on to this method again.
+			 */
 //			try {
 //				if (!onBoardDisplay.dataHandler.supportedPIDs.get(PID)) {
 //					//byte[] blank = new byte[expectedBytes];

@@ -1,5 +1,13 @@
 package onBoardDisplay.GUI.HUDLayouts;
 
+/*
+ * This panel is the one that shows real-time data on dash board styled layouts. It can hold many
+ * different layouts in its array, and allows the user to add to the list by creating new ones. The
+ * layouts consist of a group of 'widgets' that will display data in a variety of ways that is 
+ * continuously updated. The user can also edit the layouts by linking to the DashCustomisation
+ * panel. Only custom panels can be edited; some preset ones are read-only.
+ */
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -50,6 +58,11 @@ public class Dash {
 			new Menu.MenuPanel.Option("Select Layout",55,onBoardDisplay.graphicsHeight-60-55,300,60,null) {
 				@Override
 				public void action() {
+					/*
+					 * This method is for the 'Select Layout' button, which brings up a dialog of all the dash
+					 * layouts currently available. When one is selected, it is put into the 'currentArrangement'
+					 * variable, which is the one accessed by all the other methods.
+					 */
 					JPanel dialogPanel = new JPanel();
 					dialogPanel.add(new JLabel("Select layout to use:"));
 					DefaultComboBoxModel model = new DefaultComboBoxModel();
@@ -74,6 +87,10 @@ public class Dash {
 			new Menu.MenuPanel.Option("New Layout",55+300+5,onBoardDisplay.graphicsHeight-60-55,300,60,null) {
 				@Override
 				public void action() {
+					/*
+					 * This method is for the 'New Layout' button. It creates a new blank layout that can be
+					 * edited by the user in the dash customisation panel. 
+					 */
 					String name = JOptionPane.showInputDialog(null,"Enter New Dash Layout Name:");
 					DashArrangement newArr = new DashArrangement(name, true,
 							new DialSkin1[] {},
@@ -93,6 +110,11 @@ public class Dash {
 			new Menu.MenuPanel.Option("Edit Layout",55+600+10,onBoardDisplay.graphicsHeight-60-55,300,60,null) {
 				@Override
 				public void action() {
+					/*
+					 * This method submits the current layout to the dash customisation panel, where it can be edited
+					 * by the user. This will only work if the current layout is marked with permission to edit, as some
+					 * are kept as protected presets.
+					 */
 					if (currentArrangement.customisable) {
 						System.out.println("Starting Layout Edit.");
 						onBoardDisplay.dashCustomisationPanel.dialList = currentArrangement.dialList;
@@ -113,6 +135,10 @@ public class Dash {
 			}
 		};
 		int currentArrangementID = 0;
+		/*
+		 * This list defines some basic layouts, however, this is not needed unless there is no dash layout
+		 * file created yet.
+		 */
 		public static DashArrangement[] arrangements = new DashArrangement[] {
 				new DashArrangement("Default", false,
 						new DialSkin1[] {new DialSkin1(pidList[0],100,150,200,200,pidList[0].min,pidList[0].max,(float)0.8),
@@ -141,6 +167,12 @@ public class Dash {
 		DashArrangement currentArrangement = arrangements[0];
 		
 		public static class DashArrangement {
+			/*
+			 * This is the class that defines the dash board layouts as an object. Each has an array that
+			 * contains the various types of widgets that it may contain. This includes dials, bars, and
+			 * 'mini' graphs (which are limited to one plotted value for now for dash panel use, or there
+			 * would be too much delay between refreshes).
+			 */
 			public String name;
 			public boolean customisable;
 			public DialSkin1[] dialList;
@@ -158,6 +190,7 @@ public class Dash {
 		
 		@Override
         public void mousePressed(MouseEvent e) {
+			//Already explained in Detail Panel
             int trueXPos = e.getX();
             int trueYPos = e.getY();
             int xPos = (int)((trueXPos - onBoardDisplay.xOffset)/onBoardDisplay.graphicsMultiplier);
@@ -204,6 +237,7 @@ public class Dash {
         }
 		
 		private void keyAction (String actionString) {
+			//Already explained in Detail Panel
             if (running) {
                 if (actionString.equals("ESCAPE")){
                     running = false;
@@ -221,6 +255,14 @@ public class Dash {
         }
 		
 		class UpdateLoop implements Runnable {
+			/*
+			 * This thread structure is how I run my updating GUI panels. The multi-threading is needed
+			 * because I need to continuously be updating the data that is displayed in the dials, while
+			 * at the same time refreshing the GUI drawing and widget statuses. Also, the GUI needs to
+			 * remain interactive so the user can exit the screen or use buttons. This thread simply contains
+			 * code to read and decode all of the PIDs being used in this panel, saving them to global
+			 * variables.
+			 */
 	        private Thread dashLoop;
 	        @Override
 	        public void run() {
@@ -284,6 +326,7 @@ public class Dash {
 		
 		@Override
         public void paint(Graphics g) {
+			//Already explained in Detail Panel
             super.paint(g);
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,

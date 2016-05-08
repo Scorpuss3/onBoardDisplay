@@ -1,5 +1,13 @@
 package onBoardDisplay.GUI.components;
 
+/*
+ * This class defines the overall dial object. Dials are used as widgets within other panels,
+ * most of the time the dash panel. They have several attributes that specify the location and
+ * shape in which they are drawn. They can contain text displays, and 'pins' that sweep like on
+ * an analogue dial to be able to show changing values. This class is not used directly, but as
+ * a basis for other derived classes.
+ */
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -56,6 +64,11 @@ public class Dial {
 		}
 		
 		public void update(float reading) {
+			/*
+			 * The update method allows the values of the dial components to change when other
+			 * information does. For example, when the sensor value changes, the text displaying
+			 * the value will change, and so will the angle that the pin is drawn at.
+			 */
 			float asProportion = (reading-min) / (float)(max-min);
 			int angle,angleFromDown,xDirection,yDirection,modX,modY;
 			float circleProportionBelowOrigin = (circleProportion-(float)0.5)/2;
@@ -99,6 +112,10 @@ public class Dial {
 	}
 	
 	public class ImagePart {
+		/*
+		 * the dials can contain images, which I have used for backgrounds. This just allows the images
+		 * to be loaded and handled as part of the dial.
+		 */
 		public BufferedImage image;
 		public int relativeX;
 		public int relativeY;
@@ -115,6 +132,7 @@ public class Dial {
 	}
 	
 	public class Text {
+		//The dials can also contain text, for displaying values, PID names, and units.
 		public String displayText;
 		public int fontSize;
 		public String font;

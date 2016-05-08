@@ -1,5 +1,14 @@
 package onBoardDisplay.GUI.HUDLayouts;
 
+/*
+ * The panel described by this class is a display containing only one widget- a single large graph
+ * that can have up to 4 PIDs plotted on the same axis. The user can choose the PIDs they want to
+ * see displayed using the selection dialog found in the data handler class. The PIDs will be
+ * measured and plotted over time, with a memory of 200 values for each PID. This is useful for
+ * spotting trends between sensors that should be related. This class basically acts as a simple
+ * wrapper for a graph widget, by adding buttons to control its function.
+ */
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -45,6 +54,11 @@ public class Graph {
 			new Menu.MenuPanel.Option("Start Recording",55,onBoardDisplay.graphicsHeight-60-55,350,60,null) {
 				@Override
 				public void action() {
+					/*
+					 * This method is for the 'Start Recording' button. When recording is started, values start to be
+					 * saved into the memory of the graph, and plotted out over time. Clicking the button again will
+					 * stop the recording process.
+					 */
 					if (recording) {
 						this.currentCaption = "Start Recording";
 						recording = false;
@@ -63,6 +77,10 @@ public class Graph {
 			new Menu.MenuPanel.Option("Select PIDs",55+400+5,onBoardDisplay.graphicsHeight-60-55,350,60,null) {
 				@Override
 				public void action() {
+					/*
+					 * This method is for the 'Select PIDs' button- it will bring up the PID selection dialog from the
+					 * data handler, and re-create the graph with the new PIDs selected as parameters.
+					 */
 					PID[] selected = onBoardDisplay.dataHandler.selectSupportedPIDsDialog(4,false);//TODO change back to true
 					try {
 						if (selected[1]!=null) {
@@ -87,6 +105,7 @@ public class Graph {
 		
 		@Override
         public void mousePressed(MouseEvent e) {
+			//Already explained in Detail Panel
             int trueXPos = e.getX();
             int trueYPos = e.getY();
             int xPos = (int)((trueXPos - onBoardDisplay.xOffset)/onBoardDisplay.graphicsMultiplier);
@@ -130,6 +149,7 @@ public class Graph {
         }
 		
 		private void keyAction (String actionString) {
+			//Already explained in Detail Panel
             if (running) {
                 if (actionString.equals("ESCAPE")){
                     running = false;
@@ -147,6 +167,7 @@ public class Graph {
         }
 		
 		class UpdateLoop implements Runnable {
+			//Already explained in Dash Panel
 	        private Thread graphLoop;
 	        @Override
 	        public void run() {
@@ -199,6 +220,7 @@ public class Graph {
 		
 		@Override
         public void paint(Graphics g) {
+			//Already explained in Detail Panel
             super.paint(g);
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,

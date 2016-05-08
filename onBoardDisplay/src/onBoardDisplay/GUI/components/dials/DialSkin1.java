@@ -1,5 +1,10 @@
 package onBoardDisplay.GUI.components.dials;
 
+/*
+ * This class is basically the same as the barWidget, but it draws more like a round traditional
+ * dial when it is put on canvas. It keeps its rotating pin.
+ */
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -44,14 +49,7 @@ public class DialSkin1 extends Dial{
 	}
 	
 	public void draw(Graphics2D g2d, JPanel panel) {
-		//(images[0].image).setRGB(images[0].image.getWidth(),images[0].image.getHeight(),new Color(255,0,0).getRGB());
-	    //BufferedImage img = new BufferedImage(images[0].image.getWidth(null), images[0].image.getHeight(null),
-	    //    BufferedImage.TRANSLUCENT);
-	    //Graphics2D graphics = img.createGraphics();
-	    //Color newColor = new Color(100, 0, 0, 0 /* alpha needs to be zero */);
-	    //graphics.setXORMode(newColor);
-	    //graphics.drawImage(images[0].image, 0, 0, null);
-	    //graphics.dispose();
+		//Explained in barWidget
 		g2d.drawImage(images[0].image,
 				onBoardDisplay.ModifyAspectX(startX + (images[0].relativeX) * xMod),
 				onBoardDisplay.ModifyAspectY(startY + (images[0].relativeY) * yMod),

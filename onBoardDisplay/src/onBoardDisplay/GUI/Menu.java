@@ -1,5 +1,12 @@
 package onBoardDisplay.GUI;
 
+/*
+ * This class represents a panel that shows the menu screens used throughout the software.
+ * It displays each option as 'buttons' that can be clicked to move onto new menus or
+ * to another panel. Each button can have a function. This is also the first panel the user
+ * will see (apart from the splash screen), when it displays the main menu.
+ */
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -36,6 +43,10 @@ public class Menu {
         protected boolean sensing = false;
         public Image button;
 		public Image buttonPressed;
+		/*
+		 * These lists of buttons are what dictates the contends of all the menus used in the software.
+		 * Each array represents a different menu screen that can be switched to.
+		 */
         protected Option[] mainMenu = new Option[] {
             new Option("Display Readings") {
                 @Override
@@ -182,6 +193,13 @@ public class Menu {
             new Option("Change Colours") {
                 @Override
                 public void action() {
+                	/*
+                	 * This method is activated by the 'change colour' button is the options screen.
+                	 * It brings up a dialog similar to the one for selecting PIDs that allows the user
+                	 * to select 4 colours from drop-down lists of available GUI colours. Once this is
+                	 * complete, they will be saved, and the software will be restarted so that the
+                	 * changes can be applied.
+                	 */
                 	String[] availableColourStrings = onBoardDisplay.dataHandler.colourNames.keySet().toArray(new String[onBoardDisplay.dataHandler.colourNames.size()]);
             		JPanel dialogPanel = new JPanel();
             		dialogPanel.add(new JLabel("Select Colours (default: BLACK, GREEN, RED, PINK):"));
@@ -233,6 +251,11 @@ public class Menu {
             new Option("Reconnect Adaptor") {
                 @Override
                 public void action() {
+                	/*
+                	 * This option allows the user to restart the connection with the adaptor. This means
+                	 * they can move the laptop or other device between different cars without it needing
+                	 * to have the software restarted each time. It also made debugging quicker.
+                	 */
                 	this.currentCaption = "RECONNECTING...";
                 	onBoardDisplay.carInterface = new CarInterface();
                 	while (!onBoardDisplay.carInterface.initialised) {
@@ -257,6 +280,7 @@ public class Menu {
         
         @Override
         public void paint(Graphics g) {
+			//Explained in Detail Panel
             super.paint(g);
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -311,6 +335,13 @@ public class Menu {
         }
     
         public static class Option{
+        	/*
+        	 * This is the class that defines the button objects. They have a size and shape, but
+        	 * most importantly have an action function that can be customised (which is defined
+        	 * above in all the menu arrays). They can also be selected and unselected, which allows
+        	 * the colours to be changed when the user is hovering over the button, or the keyboard
+        	 * is used for button selection.
+        	 */
             public String currentCaption;
             public int xPosition;
             public int yPosition;
@@ -351,6 +382,7 @@ public class Menu {
         
         @Override
         public void mousePressed(MouseEvent e) {
+			//Explained in Detail Panel
             int trueXPos = e.getX();
             int trueYPos = e.getY();
             int xPos = (int)((trueXPos - onBoardDisplay.xOffset)/onBoardDisplay.graphicsMultiplier);
@@ -423,6 +455,7 @@ public class Menu {
         }
     
         private void keyAction (String actionString) {
+			//Explained in Detail Panel
             if (sensing) {
                 if (actionString.equals("UP")){
                     int ui = getSelectedIndex();
@@ -452,6 +485,7 @@ public class Menu {
         }
         
         public void startSensing() {
+        	//Allows the panel to recieve input from the mouse and keyboard.
             sensing = true;
         }
         

@@ -1,5 +1,11 @@
 package onBoardDisplay;
 
+/*
+ * This class is a very simple pattern for a splash panel to be displayed so that the user
+ * can see that the software is loading after they click the icon, so they don't keep clicking
+ * needlessly. Also gives them something to look at in the sometimes long load time. 
+ */
+
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;

@@ -1,5 +1,12 @@
 package onBoardDisplay.GUI.HUDLayouts;
 
+/*
+ * This class describes the panel for track day recording functions- recording both 0-60 and 1/4 mile
+ * times. When the user tells the software to start recording, it will wait for the vehicle to halt,
+ * and then start timing when it starts moving again. Then, depending on the current mode, it will
+ * stop the timer either when the vehicle reaches 60mph, or reaches a distance of 1/4 mile.
+ */
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -48,6 +55,10 @@ public class TrackTest {
 			new Menu.MenuPanel.Option("Start Recording",55,onBoardDisplay.graphicsHeight-60-55,350,60,null) {
 				@Override
 				public void action() {
+					/*
+					 * This method is for the recording button. When clicked, it will start 'scanning', which is
+					 * when it is waiting for the vehicle to stop.
+					 */
 					if (scanning) {
 						this.currentCaption = "Start Recording";
 						scanning = false;
@@ -65,6 +76,9 @@ public class TrackTest {
 			new Menu.MenuPanel.Option("Mode: "+currentMode,55+400+5,onBoardDisplay.graphicsHeight-60-55,350,60,null) {
 				@Override
 				public void action() {
+					/*
+					 * This method will switch the mode between 0-60 and 1/4 mile when called by the button.
+					 */
 					if (currentMode == "0-60") {
 						currentMode = "1/4 Mile";
 						this.currentCaption  = "Mode: "+currentMode; 
@@ -84,6 +98,7 @@ public class TrackTest {
 		
 		@Override
         public void mousePressed(MouseEvent e) {
+			//Already explained in Detail Panel
             int trueXPos = e.getX();
             int trueYPos = e.getY();
             int xPos = (int)((trueXPos - onBoardDisplay.xOffset)/onBoardDisplay.graphicsMultiplier);
@@ -127,6 +142,7 @@ public class TrackTest {
         }
 		
 		private void keyAction (String actionString) {
+			//Already explained in Detail Panel
             if (running) {
                 if (actionString.equals("ESCAPE")){
                     running = false;
@@ -144,10 +160,20 @@ public class TrackTest {
         }
 		
 		class UpdateLoop implements Runnable {
+			/*
+			 * This thread holds the detail for how the timing works. It works in stages, each stage selecetd through 
+			 * booleans, and the first started by clicking a button. First of all, when the recording is started, the
+			 * software starts 'scanning'. It will do nothing until the vehicle reaches 0mph. At this point, it will
+			 * wait until there is motion again, and start the timer. During this stage the thread is continually
+			 * polling the sensors to see if the objective (defined by the mode) has bee reached. When it is, the timer
+			 * is stopped, and the time is added to an array (which is displayed on-screen to the user). If the time is
+			 * good enough, it will be automatically added to the leader board with the current profile name in
+			 * settings as the name. 
+			 */
 	        private Thread trackTestLoop;
 	        @Override
 	        public void run() {
-	            while (true)  {//TODO change this so that it can be deactivated at program close later.
+	            while (true)  {
 	            	if (scanning) {
 	            		oldTime = newTime;
 	            		newTime = System.currentTimeMillis();
@@ -265,6 +291,7 @@ public class TrackTest {
 		
 		@Override
         public void paint(Graphics g) {
+			//Already explained in Detail Panel.
             super.paint(g);
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,

@@ -1,5 +1,17 @@
 package onBoardDisplay.GUI.HUDLayouts;
 
+/*
+ * This panel works with the dash panel. It can only be reached by the user if they select a layout
+ * and then click 'Edit' in the GUI. At this point, the information about the Dash current layout
+ * will be transferred to this class, and the customisation will begin. The user has the option to
+ * create as many bars and dials as they like. They can add them by specifying the PID that they will
+ * display, and then can click where they want the top left, and then bottom right corner. With Bars
+ * they can then specify whether they want the bar to move horizontally or vertically. The user can also
+ * delete any widget they want if they have drawn it in the wrong place or want a change This means the
+ * user can create any layout they could want to their own taste, with widgets where they want,
+ * whatever size they want.
+ */
+
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -43,6 +55,11 @@ public class DashCustomisation {
 			new Menu.MenuPanel.Option("Add Dial",55,onBoardDisplay.graphicsHeight-60-55,250,60,null) {
 				@Override
 				public void action() {
+					/*
+					 * This method starts the addition of a new Dial. The various buffer values held as class attributes
+					 * will be progressively filled as it goes through the stages of planting a Dial from a dialog for
+					 * PID selection (from the data handler), to clicking where the new item is wanted.
+					 */
 					try {
 						helpMessage = "Adding new Dial...";
 						newPid = onBoardDisplay.dataHandler.selectSupportedPIDsDialog(1,false)[0];
@@ -59,6 +76,9 @@ public class DashCustomisation {
 			new Menu.MenuPanel.Option("Add Bar",55+250+5,onBoardDisplay.graphicsHeight-60-55,250,60,null) {
 				@Override
 				public void action() {
+					/*
+					 * The add bar button does the same thing as the 'add dial' one, but adds a bar...
+					 */
 					try{
 						helpMessage = "Adding new Bar...";
 						newPid = onBoardDisplay.dataHandler.selectSupportedPIDsDialog(1,false)[0];
@@ -75,6 +95,11 @@ public class DashCustomisation {
 			new Menu.MenuPanel.Option("Delete Item",55+500+10,onBoardDisplay.graphicsHeight-60-55,250,60,null) {
 				@Override
 				public void action() {
+					/*
+					 * This button allows the user to delete any widget present on the layout. Once they have
+					 * selected it, the next item they click on will be deleted. If they click on blank space,
+					 * nothing will be deleted.
+					 */
 					System.out.println("Started item deleting, waiting for selection.");
 					helpMessage = "Click on Item to Delete";
 					deleting = true;
@@ -84,6 +109,12 @@ public class DashCustomisation {
 			new Menu.MenuPanel.Option("Save",55+750+10,onBoardDisplay.graphicsHeight-60-55,250,60,null) {
 				@Override
 				public void action() {
+					/*
+					 * This method is for the save button. It will load the currently edited layout into an object
+					 * of the DashArrangement class from Dash, and then set it to the currentArrangement in Dash,
+					 * at which point it will start updating the widgets with data. This method also saves the
+					 * layouts to file by calling the method in the data handler.
+					 */
 					DashArrangement newArrangement = new DashArrangement(onBoardDisplay.dashPanel.currentArrangement.name, true,
 							dialList,
 							barList,
@@ -105,6 +136,7 @@ public class DashCustomisation {
 		
 		@Override
         public void mousePressed(MouseEvent e) {
+			//Already explained in Detail Panel
             int trueXPos = e.getX();
             int trueYPos = e.getY();
             int xPos = (int)((trueXPos - onBoardDisplay.xOffset)/onBoardDisplay.graphicsMultiplier);
@@ -206,6 +238,12 @@ public class DashCustomisation {
         }
 		
 		public void addBufferItem() {
+			/*
+			 * This is called by both the 'add' buttons for dials and bars. It will create an empty
+			 * dial or bar object in the current layout's list, which can be edited as the changes
+			 * progress. This list will then be added to a new layout object at the end when it is
+			 * then saved to the Dash class.
+			 */
 			if (addingDial) {
 				DialSkin1[] newDialList = new DialSkin1[dialList.length+1];
 				for (int i = 0; i < dialList.length; i++) {
@@ -254,6 +292,7 @@ public class DashCustomisation {
         }
 		
 		private void keyAction (String actionString) {
+			//Already explained in Detail Panel
             if (running) {
                 if (actionString.equals("ESCAPE")){
                     running = false;
@@ -281,6 +320,7 @@ public class DashCustomisation {
 		
 		@Override
         public void paint(Graphics g) {
+			//Already explained in Detail Panel
             super.paint(g);
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,

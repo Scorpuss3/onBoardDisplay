@@ -1,5 +1,11 @@
 package onBoardDisplay.GUI.components.dials;
 
+/*
+ * This class is one of the classes derived from Dial. However, instead displaying a circular dial
+ * it uses a straight bar with a horizontal line showning the data value. This means it changes
+ * very little from the parent class, and shares most methods.
+ */
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -35,6 +41,11 @@ public class BarWidget extends Dial{
 	}
 	
 	public void draw(Graphics2D g2d, JPanel panel) {
+		/*
+		 * This method is used to draw the bar given a panel and graphic canvas to draw on. This
+		 * will be supplied by the GUI panel it is being drawn onto. This method will then go
+		 * through each part of the bar in turn, drawing it onto the canvas.
+		 */
 		g2d.setColor(onBoardDisplay.guiColours[1]);
 		g2d.fillRect(onBoardDisplay.ModifyAspectX(startX),
 				onBoardDisplay.ModifyAspectY(startY),

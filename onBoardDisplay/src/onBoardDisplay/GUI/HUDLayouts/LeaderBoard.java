@@ -1,5 +1,13 @@
 package onBoardDisplay.GUI.HUDLayouts;
 
+/*
+ * This class is for the leader board display panel. In my software there are two leader
+ * boards, one for 0-60mph, and one for 1/4 mile. These are both saved in files and loaded
+ * by the data handler. This panel takes the data from the data handler, and draws the list
+ * of each person and their times (in order, quickest first). There is an option with a
+ * button to switch between viewing the 0-60 and 1/4 mile times.
+ */
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -40,6 +48,10 @@ public class LeaderBoard {
 			new Menu.MenuPanel.Option("Mode: "+currentMode,55,onBoardDisplay.graphicsHeight-60-55,350,60,null) {
 				@Override
 				public void action() {
+					/*
+					 * This method is for the mode switching button that changes between 0-60 and 1/4 mile
+					 * leader boards being shown.
+					 */
 					if (currentMode == "0-60") {
 						currentMode = "1/4 Mile";
 						this.currentCaption  = "Mode: "+currentMode;
@@ -61,6 +73,7 @@ public class LeaderBoard {
 		
 		@Override
         public void mousePressed(MouseEvent e) {
+			//Already explained in Detail Panel
             int trueXPos = e.getX();
             int trueYPos = e.getY();
             int xPos = (int)((trueXPos - onBoardDisplay.xOffset)/onBoardDisplay.graphicsMultiplier);
@@ -104,6 +117,7 @@ public class LeaderBoard {
         }
 		
 		private void keyAction (String actionString) {
+			//Already explained in Detail Panel
             if (running) {
                 if (actionString.equals("ESCAPE")){
                     running = false;
@@ -130,6 +144,7 @@ public class LeaderBoard {
 		
 		@Override
         public void paint(Graphics g) {
+			//Already explained in Detail Panel
             super.paint(g);
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,

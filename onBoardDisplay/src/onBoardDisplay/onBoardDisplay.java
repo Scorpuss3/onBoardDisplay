@@ -1,5 +1,12 @@
 package onBoardDisplay;
 
+/*
+ * This class is the main class, and is called on startup. It creates all the instances
+ * needed by the software during run, such as panels for the GUI, a DataHandler for keeping
+ * track of data flow, and a CarInterface for controlling the socket communication with
+ * the ELM327 WIFI adaptor connected to the vehicle's ECU. 
+ */
+
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.io.File;
@@ -52,6 +59,12 @@ public class onBoardDisplay {
 	public static int yOffset;
 	
 	public static void restart() {
+		/*
+		 * This method does exactly what you would expect- exits the software and causes it to be re-loaded.
+		 * This functionality is used where settings changes require textures to be re-loaded (e.g. change
+		 * of GUI colours). This requires getting the path of the executable file and issuing a command to
+		 * run the program, then quickly closing the old one.
+		 */
 		final String javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
 		File currentJar = null;
 		try {
@@ -72,6 +85,14 @@ public class onBoardDisplay {
 		System.exit(0);
 	}
 	public static void calculateAspect() {
+		/*
+		 * Used in conjunction with the below modifyAspect* methods, this calculates the largest
+		 * possible GUI size with a pre-determined aspect, then calculates values to offset (add
+		 * blank bars to sides or top) if the screen being used is the wrong aspect. The multipliers
+		 * calculated are to scale up the GUI (which is managed on a constant sized grid system) to
+		 * fill the screen as desired. The below methods are called to modify coordinates from the
+		 * grid to correct screen locations to be drawn.
+		 */
 		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 		trueWidth = gd.getDisplayMode().getWidth();
 		trueHeight = gd.getDisplayMode().getHeight();
@@ -129,7 +150,12 @@ public class onBoardDisplay {
     	shutdown(0);
     }
 
-	public static void main(String[] args) {		
+	public static void main(String[] args) {
+		/*
+		 * The first-called method in the software, where the classes needed are instantiated,
+		 * and after the menu is created, the mouse and keyboard listeners allowed to function.
+		 * There is also a small part that tests some functions of the code with printouts.
+		 */
 		topLayerFrame = new JFrame();
 		calculateAspect();
 		

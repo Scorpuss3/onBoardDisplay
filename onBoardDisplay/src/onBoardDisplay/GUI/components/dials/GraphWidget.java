@@ -1,5 +1,13 @@
 package onBoardDisplay.GUI.components.dials;
 
+/*
+ * This component is still derived from Dial, but it modifies the parent class quite a lot.
+ * For example, instead of having a single PID to read, it has an array of them that can be
+ * specified on creation, It also has a memory of values so that they can be plotted over
+ * time. It is still a widget, so can be placed on dash layouts, but also has its own Graph
+ * panel that has only a single graph displayed with many PIDs.
+ */
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -39,6 +47,11 @@ public class GraphWidget extends Dial{
 	}
 	
 	public void update(float time) {
+		/*
+		 * The update method for the graph is very modified from the Dial one. It loops through all the PIDs,
+		 * and saves the new values, adding them to its memory arrays (it has one for each PID it is reading).
+		 * The time array is also added to, with the differences in time being recorded.
+		 */
 		for (PID currentPID : displayedPIDs) {
 			byte[] rawBytes = onBoardDisplay.carInterface.readPID(currentPID.ID, false);//TODO consider turning autoretry on...
 			float realValue = onBoardDisplay.dataHandler.decodePIDRead(rawBytes, currentPID);
@@ -76,6 +89,9 @@ public class GraphWidget extends Dial{
 	}
 	
 	public void clear() {
+		/*
+		 * This method will wipe the contents of the arrays for time and all PIDs being read.
+		 */
 		times = new float[0];
 		for (int i = 0; i< displayedPIDs.length; i++) {
 			dataStore.put(displayedPIDs[i],new float[]{});
@@ -83,6 +99,12 @@ public class GraphWidget extends Dial{
 	}
 	
 	public void draw(Graphics2D g2d, JPanel panel) {
+		/*
+		 * The draw method becomes very complicated for the graph. It uses the data from the arrays
+		 * to plot many small lines between all the data points for each of the PIDs in their own
+		 * colours. There are also some labels added every so often to show the real values of the
+		 * data that is being plotted.
+		 */
 		g2d.drawImage(images[0].image,
 				onBoardDisplay.ModifyAspectX(startX + (images[0].relativeX) * xMod),
 				onBoardDisplay.ModifyAspectY(startY + (images[0].relativeY) * yMod),

@@ -1,5 +1,14 @@
 package onBoardDisplay.dataHandling;
 
+/*
+ * This class contains most of the methods for handling all the underlying data moving around
+ * in the software. It holds variables for all the textures, and data structures for many
+ * other things like leader boards, supported PIDs, database informations and codes etc. It also
+ * provides the methods for handling and manipulating all this data. This includes the
+ * connections to the various mySQL databases the software uses to keep track of the error codes,
+ * PIDs, manufacturers, dash board layouts and profiles.
+ */
+
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.Color;
@@ -106,6 +115,10 @@ public class DataHandler {
 	private Connection codeC, PIDC, locationC;
 	
 	public DataHandler() {
+		/*
+		 * Initiates the connections to all the external data holding files. Some are databases, and
+		 * others (like leader boards) are just plain text files.
+		 */
 		//TODO Add test to see if using resource pack, then react accordingly.
 		loadOptions();
 		loadCarResources("generic");
@@ -116,6 +129,12 @@ public class DataHandler {
 	}
 	
 	public static class Location {
+		/*
+		 * This child class does not inherit but is most still defined within data handling as this
+		 * is all the class is used for. A location represents a location in the 3D cuboid that
+		 * represents the vehicle being tested. This location is used to plot the location of errors
+		 * on canvas to show the user.
+		 */
 		public int xPos = 0;
 		public int yPos = 0;
 		public int zPos = 0;
@@ -145,12 +164,23 @@ public class DataHandler {
 	}
 	
 	public static String getMajorLocationFromCode (String locationCode) {
+		/*
+		 * Each location has been given a short location by me (e.g. ENG = engine block). This
+		 * method just converts between the code and the friendly name that is displayed in the
+		 * GUI.
+		 */
 		String description;
 		description = majorLocationCodeDescriptions.get(locationCode);
 		return description;
 	}
 	
 	public Location getMinorLocation (String vehicleName, String locationName) {
+		/*
+		 * This method returns a Location mad up of the coordinates it gets from the location database
+		 * for the vehicle in question. the parameters are the vehicleName and locationName, which are
+		 * both used in the database to retrieve the information. The coordinates represent a 3D location
+		 * on the vehicle being monitored.
+		 */
 		//in percentages...
 		int x=0, y=0, z=0;
 		Statement st;
@@ -174,6 +204,11 @@ public class DataHandler {
 	}
 	
 	public String getMajorLocation (String vehicleName, String locationName) {
+		/*
+		 * This just gets the major location (general area like Engine block) given a vertain component
+		 * from the vehicle (e.g. cylinder 1). This is just a short coded major location name, which can
+		 * then be decoded for the GUI using the getMajorLocationFromCode() method.
+		 */
 		//in percentages...
 		String majorLocation = "";
 		Statement st;
@@ -194,12 +229,13 @@ public class DataHandler {
 		return majorLocation;
 	}
 	
-	//TODO Remove this when possible...
-	//public static Code decodeErrorCode (short code) {
-	//	return new Code((short)1,"A Made up Code","UNK", "Steering Wheel");
-	//}
-	
 	public static boolean getBit(byte[] byteArray, int position) {
+		/* 
+		 * A multipurpose method used in many places in my software. Given an array of bytes, it will return
+		 * a single bit of data given the location it is needed from. This is useful, for example, where some
+		 * PIDs return multiple bits of different data in one byte, where each bit represents something different.
+		 * This method allows you to extract only what you want.
+		 */
 		try {
 			int byteNumber = position / 8;//did not have -1, so index off by 1!
 			//int startingBitValue = (int) Math.pow(2,byteNumber*8 + 1);
@@ -218,12 +254,22 @@ public class DataHandler {
 	}
 	
 	public static String getHexCharacters(byte b) {
+		/*
+		 * This method returns the characters for the hexadecimal that would represent the
+		 * byte given as the parameter.
+		 */
 		int bytePart1 = ((byte)(b >>> 4) & 0x0F);
 		int bytePart2 = (b & 0x0F);
 		return ((Character)hexChars[bytePart1]).toString() + ((Character)hexChars[bytePart2]).toString(); 
 	}
 	
 	public static byte getByteFromHexString(String s) throws RuntimeException {
+		/*
+		 * Gets a byte value from a hexadecimal string that is given as a parameter (the
+		 * opposite of the method above). At the moment it only works for one byte at a
+		 * time, and I have a found no need for more bytes being processed at the same
+		 * time. 
+		 */
 		//Will be 2's Compliment now.
 		if (s.length() > 2) {
 			throw new RuntimeException("Can only supply this function for 1 byte at a time. Gave more that 2 hex characters: "+s);
@@ -234,6 +280,10 @@ public class DataHandler {
 	}
 	
 	public PID[] getAvailablePids() {
+		/*
+		 * This takes the map created in the carInterfacing class, and extracts only the PIDs available to use
+		 * with this particular vehicle, and returns them in an array.
+		 */
 		Set set = supportedPIDs.entrySet();
 		Iterator it = set.iterator();
 		int tally = 0;
@@ -260,6 +310,11 @@ public class DataHandler {
 	}
 	
 	public PID[] getAllPids() {
+		/*
+		 * Similar to the above method, but simply returns an array of all possible PIDs that
+		 * any vehicle could support. This allows the user to do things like design dash board
+		 * layouts without being connected to a vehicle to tell them what PIDs can be used.
+		 */
 		PID[] allPIDs = new PID[101];
 		for (int i = 0; i <=100; i++) {
 			System.out.print("Getting "); System.out.println((byte)i);
@@ -269,6 +324,12 @@ public class DataHandler {
 	}
 	
 	public PID[] selectSupportedPIDsDialog(int numberToChoose, boolean onlyUseAvailable) {
+		/*
+		 * This method creates a pop-up box on the user's screen that will ask them for a selection of PIDs.
+		 * Depending on the parameters, this may be from the PIDs currently avilable on the vehicle, or
+		 * perhaps all PIDs possible on any vehicle. Another parameter is numberToChoose, which specifies
+		 * how many PIDs the user must select using drop-down menus.
+		 */
 		PID[] selected  = new PID[numberToChoose];
 		JPanel dialogPanel = new JPanel();
 		dialogPanel.setLayout(new BoxLayout(dialogPanel,BoxLayout.Y_AXIS));//Makes panel add items vertically...
@@ -317,6 +378,11 @@ public class DataHandler {
 	}
 	
 	public void loadDashArrangements() {
+		/*
+		 * This method loads the dash board arrangement data into the Dash class by extracting them from a text
+		 * file encoded using my own method for identifying each dash widget on the screen. Each is identified
+		 * with their locations and other important information such as dial type and PID to be displayed.
+		 */
 		DashArrangement[] allArrangements = new DashArrangement[] {};
 		try {
 			InputStream inputStream = new FileInputStream("dashArrangements");
@@ -421,6 +487,10 @@ public class DataHandler {
 	}
 	
 	public void saveDashArrangements() {
+		/*
+		 * Same as  the above method but backwards, saves all currently held dash board layouts into
+		 * the text file. This includes custom ones the user may have created.
+		 */
 		System.out.println("Saving Dash Layouts...");
 		try {
 			File oldFile = new File("dashArrangements");
@@ -492,6 +562,14 @@ public class DataHandler {
 	}
 	
 	public void loadCarResources(String resourceName) {
+		/*
+		 * This method loads all the car image textures based on the vehicle name that is being scanned.
+		 * It also uses a generic image set for vehicles that are not currently in the databases. The
+		 * images are also tinted using the tinting method also in this class. This is the reason the
+		 * software has to be re-started when the GUI colours are changed. Perhaps an improvement would
+		 * be that the raw images are stored, and are tinted when they are drawn onto the screen. This
+		 * would allow better flowing use of the software.
+		 */
 		//TODO Remove below declaration...
 		resourceName = "generic";
 		if (resourceName == "generic") {
@@ -532,7 +610,13 @@ public class DataHandler {
 	}
 	
 	public BufferedImage tintBufferedImage(String location, Color tintColour) {
-		//Image img = new BufferedImage(1,1,1);
+		/*
+		 * This method takes an image location and tinting colour as its parameters. It creates an image
+		 * object from the image location, and then places a tinting over the top. This meant I had to
+		 * create my images very specifically with only the colour black, and varying amounts of
+		 * transparency. It also means that all images on their own are mono-colour, so I had to seperate
+		 * some images into layered textures.
+		 */
 		BufferedImage img = new BufferedImage(1,1,1);
 		try {
 			img = ImageIO.read(getClass().getResourceAsStream(location));
@@ -552,6 +636,10 @@ public class DataHandler {
 	}
 	
 	public void loadDatabaseConnection () {
+		/*
+		 * This method creates the connection to the databases the software uses. This includes those for
+		 * error codes, PIDs, and locations of components for different vehicles.
+		 */
 		//http://wiki.ci.uchicago.edu/VDS/VDSDevelopment/UsingSQLite
 		try {
 			codeC = DriverManager.getConnection("jdbc:sqlite:errorCodes.db");
@@ -571,6 +659,11 @@ public class DataHandler {
 	}
 	
 	public void loadLeaderBoards() {
+		/*
+		 * This method loads the leader boards for the 0-60mph and 1/4 mile times from the text file
+		 * they are stored in. They are already sorted because they are held in a data structure that
+		 * only moves though its contents in sorted order when they are read back.
+		 */
 		try {
 			System.out.println("Reading leaderboards");
 			InputStream stream014 = new FileInputStream("leaderBoard014");
@@ -650,6 +743,9 @@ public class DataHandler {
 	}
 	
 	public void saveLeaderBoards() {
+		/*
+		 * same as above method but for saving.
+		 */
 		System.out.println("Saving Leaderboards...");
 		if (leaderboard014.size() == 0 | leaderboard060.size() == 0) {
 			System.err.println("Tried to save empty leaderboard - aborted.");
@@ -698,6 +794,12 @@ public class DataHandler {
 	}
 	
 	public double getBottomLeaderBoard(TreeMap<Double,String> tm) {
+		/*
+		 * This method takes an argument that represents one of the leader boards, and returns
+		 * the last value in the list (the one with the longest time, seeing as quicker is
+		 * better). This is used for comparisons in other methods, like the one that calculates
+		 * whether a new record it good enough to be stored in the top 10 values.
+		 */
 		double lastResult = 0;
 		Set set = tm.entrySet();
 		Iterator it = set.iterator();
@@ -709,6 +811,11 @@ public class DataHandler {
 	}
 	
 	public String getGUIColourName(Color color) {
+		/*
+		 * This method returns a friendly name for a colour object used in the software. This allows
+		 * them to seem nicer when presented to the user in the dialog to select different GUI colours
+		 * in the settings screen.
+		 */
 		Set set = onBoardDisplay.dataHandler.colourNames.entrySet();
 		Iterator it = set.iterator();
 		while (it.hasNext()) {
@@ -721,6 +828,11 @@ public class DataHandler {
 	}
 	
 	public void saveOptions() {
+		/*
+		 * Saves some of the variables it is useful to keep stored without needing to be entered again. These
+		 * values are unrelated, as this is just a mis-matched data storage file. Everything is stored as a
+		 * string, so must be converted in an exact order so they are decoded in the right order.
+		 */
 		File oldFile = new File("onBoardDisplayConfig");
 		oldFile.renameTo(new File("onBoardDisplayConfig.old"));
 		oldFile = new File("onBoardDisplayConfig.old");
@@ -752,6 +864,11 @@ public class DataHandler {
 	}
 	
 	public void loadOptions() {
+		/*
+		 * same as above but loads the data. This data is mostly held in the onBoardDisplay main class,
+		 * is it is overall important running information like profile and vehicle name (along with
+		 * current GUI colours,  so they are kept saved when you re-open the software).
+		 */
 		System.out.println("Reading Config Options");
 		try {
 			InputStream inputStream = new FileInputStream("onBoardDisplayConfig");
@@ -802,6 +919,13 @@ public class DataHandler {
 	}
 	
 	public Code decodeErrorCode (String vehicleName, short id) {
+		/*
+		 * This method is used to create an instance of the Code class for error codes. It is given the
+		 * ID of the code, and it is then looked up in the error code database. Because the error codes
+		 * are different for each manufacturer, this data is gathered from the onBoardDisplay class. The
+		 * data retrieved from the database is then entered as attributes to the error code object
+		 * created, which is then returned.
+		 */
 		Code newCode = new Code();
 		int tableId = Code.getDatabaseID(id);
 		String tableName;
@@ -838,7 +962,11 @@ public class DataHandler {
 	}
 	
 	public PID decodePID (byte id) {
-		/* Decodes the data from the PID database so that it can be used in the PID class*/
+		/* 
+		 * The same as the above method, but for PIDs. Decodes the data from the PID database so that it
+		 * can be used in the PID class. These do not vary with manufacturer, so the process is slightly
+		 * simpler.
+		 */
 		PID newPID = new PID();
 		int tableId = PID.getDatabaseID(id);
 		Statement st;
@@ -876,6 +1004,17 @@ public class DataHandler {
 	}
 	
 	public float[] convertMessyNumbers(String[] rawStrings) {
+		/*
+		 * This method is used closely with the PID database when reading values from the sensors. Each PID
+		 * has its own formula for calculating the real value from the bytes the adaptor returns (which is
+		 * usually 2 bytes that must be combined in some way). To be able to store this information in a
+		 * database as text, I added fields for an addition, multiplication, then another addition, and
+		 * another multiplication. I found that I could convert almost every formula into this format so I
+		 * would be able so store it. Some formulas included the letter 'B', which was my code for the value
+		 * of the second byte needing to be included in the calculation in this position. This was a good
+		 * way of getting around the struggle of storing working formulas, as an alternative would have been
+		 * a seperate method for every sensor available to read.
+		 */
 		float[] finalParameters = new float[5];
 		for (int i = 0; i < rawStrings.length; i++) {
 			if (rawStrings[i].equals("B")) {

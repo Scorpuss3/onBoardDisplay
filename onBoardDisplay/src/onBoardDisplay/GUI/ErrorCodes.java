@@ -1,5 +1,12 @@
 package onBoardDisplay.GUI;
 
+/*
+ * This panel reads error codes for the user, and when they are decoded, it will present them
+ * to the user as a list. The user can then click on all the error codes, and they will be
+ * taken to the detail panel, where the information for the error code they clicked on will be
+ * displayed.
+ */
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -45,6 +52,7 @@ public class ErrorCodes {
 		
 		@Override
         public void mousePressed(MouseEvent e) {
+			//Explained in Detail Panel
             int trueXPos = e.getX();
             int trueYPos = e.getY();
             int xPos = (int)((trueXPos - onBoardDisplay.xOffset)/onBoardDisplay.graphicsMultiplier);
@@ -98,6 +106,7 @@ public class ErrorCodes {
         }
 		
 		private void keyAction (String actionString) {
+			//Explained in Detail Panel
             if (running) {
                 if (actionString.equals("ESCAPE")){
                     running = false;
@@ -120,6 +129,13 @@ public class ErrorCodes {
         }
 		
 		public void runScan() {
+			/*
+			 * This method is activated by a button on the GUI. It will ask the car interface instance for
+			 * the error codes from the ECU, and then decode them using methods from the data hander instance.
+			 * The data is then used to present a list of error codes to the user. The list is shown in the GUI
+			 * as buttons, and if the user clicks on them, they are taken to the detail panel that will then
+			 * display specific information for the error code they clicked on.
+			 */
 			System.out.println("Now running error code scan");
 			short[] errorCodes = onBoardDisplay.carInterface.getErrorCodes();
 			System.out.print("Num of error codes read: "); System.out.println(errorCodes.length);
@@ -166,6 +182,7 @@ public class ErrorCodes {
 		
 		@Override
         public void paint(Graphics g) {
+			//Explained in Detail Panel
             super.paint(g);
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,

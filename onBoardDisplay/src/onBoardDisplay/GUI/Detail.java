@@ -1,5 +1,13 @@
 package onBoardDisplay.GUI;
 
+/*
+ * This class contains the template for a GUI panel that shows the detail for PIDs and error codes
+ * to the user. It uses the attributes in the Code and PID classes and displays them, and takes the
+ * location attributes to present graphically. The locations are shown with three images of the
+ * vehicle from top, side, and front, with the error code area highlighted (major location), and then
+ * the exact location pinpointed from each angle with crosshairs (minor location).
+ */
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -67,6 +75,13 @@ public class Detail {
 		
 		@Override
         public void mousePressed(MouseEvent e) {
+			/*
+			 * This method is activated when the software's mouse listener detects a mouse event.
+			 * It will work out what type of event happened, and if it is supposed to perform a
+			 * function, it will call the corresponding methods. The lower part checks the location
+			 * of a mouse click against the location of the GUI buttons, so that they can be
+			 * activated if clicked on.
+			 */
             int trueXPos = e.getX();
             int trueYPos = e.getY();
             int xPos = (int)((trueXPos - onBoardDisplay.xOffset)/onBoardDisplay.graphicsMultiplier);
@@ -113,6 +128,12 @@ public class Detail {
         }
 		
 		private void keyAction (String actionString) {
+			/*
+			 * This method listens for keys being pressed on the keyboard. When one is sensed,
+			 * it checks to see if it is one it is waiting for. If so, the code block is
+			 * activated for the purpose of the key (e.g. ESCAPE closes the current screen
+			 * back to the menu screen).
+			 */
             if (running) {
                 if (actionString.equals("ESCAPE")){
                     running = false;
@@ -150,6 +171,11 @@ public class Detail {
 		
 		@Override
         public void paint(Graphics g) {
+			/*
+			 * The paint method is called every time a change is made to something. It will step through
+			 * all the parts of the GUI being shown, drawing them all with the current information they
+			 * are specified with. Each item is drawn in turn, and some similar ones are grouped together.
+			 */
             super.paint(g);
             //System.out.println("Painting....");
             Graphics2D g2d = (Graphics2D) g;
@@ -284,25 +310,14 @@ public class Detail {
         			height,
         			minorLocation,
         			ImageType.TOP);
-        	//DialSkin1 myDial = new DialSkin1(new PID(),100,350,200,200,0,180,(float)0.8);
-        	//myDial.update(0,"degrees");
-        	//myDial.draw(g2d, this);
-        	//myDial.update(90,"degrees");
-        	//myDial.draw(g2d, this);
-        	//myDial.update(180,"degrees");
-        	//myDial.draw(g2d, this);
-        	//myDial.update(45,"degrees");
-        	//myDial.draw(g2d, this);
-        	//myDial.update(135,"degrees");
-        	//myDial.draw(g2d, this);
-        	
-        	//DialSkin1 myDial2 = new DialSkin1(400,100,200,200,0,6000);
-        	//myDial2.update(1500,"rpm");
-        	//myDial2.draw(g2d, this);
-        	//g2d.drawImage(MyGraphics.scaleImageFromText("TEST TEXT",200,300),500,0,200,300,this);
 		}
 		
 		private static void drawPinpoint(Graphics2D g2d, int imgX, int imgY, int imgWidth, int imgHeight, String minorLocationName, ImageType imgType) {
+			/*
+			 * This methods is used specifically for drawing a pinpoint on the location images, given various
+			 * bits of information about the image, and the location being drawn. It analyses the information,
+			 * and then draws the pinpoint (crosshair) across the canvas over the vehicle image.
+			 */
 			Location minorLocation = onBoardDisplay.dataHandler.getMinorLocation(onBoardDisplay.vehicleName, minorLocationName);
 			int pinX,pinY;
 			System.out.print("Pinpoint locs: ");
